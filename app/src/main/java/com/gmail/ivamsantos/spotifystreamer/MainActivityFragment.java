@@ -1,7 +1,9 @@
 package com.gmail.ivamsantos.spotifystreamer;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,12 +13,21 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import kaaes.spotify.webapi.android.SpotifyApi;
+import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.Artist;
+import kaaes.spotify.webapi.android.models.ArtistsPager;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 
 /**
@@ -25,6 +36,7 @@ import java.util.List;
 public class MainActivityFragment extends Fragment {
     private ArrayAdapter<String> mArtistsAdapter;
     private View mRootView;
+    private SpotifyService mSpotify;
 
     public MainActivityFragment() {
 
@@ -33,6 +45,8 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        initSpotifyService();
+
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
 
 //        List<String> artists = Arrays.asList("Ramones", "Pearl Jam", "Dead Fish", "Deep Purple");
@@ -45,6 +59,11 @@ public class MainActivityFragment extends Fragment {
         return mRootView;
     }
 
+    private void initSpotifyService() {
+        SpotifyApi api = new SpotifyApi();
+        mSpotify = api.getService();
+    }
+
     private void initArtistsSearchBox() {
         EditText searchBox = (EditText) mRootView.findViewById(R.id.editTextSearchBox);
         searchBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -52,10 +71,36 @@ public class MainActivityFragment extends Fragment {
             public boolean onEditorAction(TextView field, int actionId, KeyEvent event) {
                 boolean handled = false;
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    Toast.makeText(getActivity(), "Searching for '" + field.getText() + "'", Toast.LENGTH_SHORT).show();
+                    String searchTerm = field.getText().toString();
+                    searchArtists(searchTerm);
                     handled = true;
                 }
                 return handled;
+            }
+        });
+    }
+
+    private void searchArtists(final String searchTerm) {
+        mSpotify.searchArtists(searchTerm, new Callback<ArtistsPager>() {
+            @Override
+            public void success(final ArtistsPager artistsPager, Response response) {
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        mArtistsAdapter.clear();
+                        for (Artist artist : artistsPager.artists.items) {
+                            mArtistsAdapter.add(artist.name);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(getActivity(), "Failed to search for '" + searchTerm + "'", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
@@ -75,5 +120,4 @@ public class MainActivityFragment extends Fragment {
             }
         });
     }
-
 }
