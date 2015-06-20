@@ -2,4 +2,9 @@
     <string name="app_name">Spotify Streamer</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_artist_top_tracks">Top 10 tracks</string>
+
+    <!-- Intent Extras -->
+    <string name="extra_artist_id" translatable="false">artist_id</string>
+    <string name="extra_artist_name" translatable="false">artist_name</string>
 </resources>

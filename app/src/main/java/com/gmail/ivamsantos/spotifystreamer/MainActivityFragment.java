@@ -1,6 +1,7 @@
 package com.gmail.ivamsantos.spotifystreamer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -129,10 +130,12 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Artist artist = mArtistsAdapter.getItem(position);
-                Toast.makeText(getActivity(), artist.name, Toast.LENGTH_SHORT).show();
-//                Intent showForecastIntent = new Intent(getActivity(), ForecastDetailActivity.class);
-//                showForecastIntent.putExtra(getString(R.string.intent_forecast_detail_object_key), forecast);
-//                startActivity(showForecastIntent);
+
+                Intent showTopTracksIntent = new Intent(getActivity(), ArtistTopTracksActivity.class);
+                showTopTracksIntent.putExtra(getString(R.string.extra_artist_id), artist.id);
+                showTopTracksIntent.putExtra(getString(R.string.extra_artist_name), artist.name);
+
+                startActivity(showTopTracksIntent);
             }
         });
     }
