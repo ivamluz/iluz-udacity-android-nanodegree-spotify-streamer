@@ -13,39 +13,41 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import kaaes.spotify.webapi.android.models.Artist;
+import kaaes.spotify.webapi.android.models.Track;
 
 /**
  * Created by iluz on 19/06/15.
  * <p/>
  * https://github.com/codepath/android_guides/wiki/Using-an-ArrayAdapter-with-ListView
  */
-public class ArtistAdapter extends ArrayAdapter<Artist> {
-    public ArtistAdapter(Context context, ArrayList<Artist> artists) {
-        super(context, R.layout.list_item_artist, artists);
+public class TrackAdapter extends ArrayAdapter<Track> {
+    public TrackAdapter(Context context, ArrayList<Track> tracks) {
+        super(context, R.layout.list_item_artist, tracks);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Artist artist = getItem(position);
+        Track track = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_artist, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_track, parent, false);
         }
 
-        ImageView artistImage = (ImageView) convertView.findViewById(R.id.artistImage);
-        TextView artistName = (TextView) convertView.findViewById(R.id.artistName);
+        ImageView albumImage = (ImageView) convertView.findViewById(R.id.albumImage);
+        TextView trackName = (TextView) convertView.findViewById(R.id.trackName);
+        TextView albumName = (TextView) convertView.findViewById(R.id.albumName);
 
-        if (artist.images.size() > 0) {
+        if (track.album.images.size() > 0) {
             // http://javatechig.com/android/how-to-use-picasso-library-in-android
             Picasso.with(getContext())
-                    .load(artist.images.get(0).url)
+                    .load(track.album.images.get(0).url)
                     .placeholder(R.drawable.ic_artist_placeholder)
                     .error(R.drawable.ic_error)
-                    .into(artistImage);
+                    .into(albumImage);
         }
 
-        artistName.setText(artist.name);
+        trackName.setText(track.name);
+        albumName.setText(track.album.name);
 
         return convertView;
     }
