@@ -75,7 +75,8 @@ public class ArtistTopTracksActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Track track = mTracksAdapter.getItem(position);
-                Toast.makeText(getActivity().getApplicationContext(), track.name, Toast.LENGTH_SHORT).show();
+                String toastContent = track.name + " - " + track.album.name;
+                Toast.makeText(getActivity().getApplicationContext(), toastContent, Toast.LENGTH_SHORT).show();
             }
         });
     }

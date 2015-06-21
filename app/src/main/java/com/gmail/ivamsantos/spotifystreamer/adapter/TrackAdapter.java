@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gmail.ivamsantos.spotifystreamer.R;
+import com.gmail.ivamsantos.spotifystreamer.helper.SpotifyImageHelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -37,14 +38,12 @@ public class TrackAdapter extends ArrayAdapter<Track> {
         TextView trackName = (TextView) convertView.findViewById(R.id.trackName);
         TextView albumName = (TextView) convertView.findViewById(R.id.albumName);
 
-        if (track.album.images.size() > 0) {
-            // http://javatechig.com/android/how-to-use-picasso-library-in-android
-            Picasso.with(getContext())
-                    .load(track.album.images.get(0).url)
-                    .placeholder(R.drawable.ic_artist_placeholder)
-                    .error(R.drawable.ic_error)
-                    .into(albumImage);
-        }
+        String imageUrl = SpotifyImageHelper.getPreferredImageUrl(track.album.images);
+        Picasso.with(getContext())
+                .load(imageUrl)
+                .placeholder(R.drawable.ic_artist_placeholder)
+                .error(R.drawable.ic_error)
+                .into(albumImage);
 
         trackName.setText(track.name);
         albumName.setText(track.album.name);
