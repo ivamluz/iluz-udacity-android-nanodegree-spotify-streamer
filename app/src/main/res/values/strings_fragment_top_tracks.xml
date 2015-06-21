@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="top_tracks_loading_title">Artist top tracks</string>
+    <string name="top_tracks_loading_description">Loading. Please wait...</string>
+</resources>

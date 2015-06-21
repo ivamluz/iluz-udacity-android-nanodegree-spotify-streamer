@@ -1,5 +1,6 @@
 package com.gmail.ivamsantos.spotifystreamer;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -30,12 +31,14 @@ import retrofit.client.Response;
  * A placeholder fragment containing a simple view.
  */
 public class ArtistTopTracksActivityFragment extends Fragment {
+    public final static String LOG_TAG = ArtistTopTracksActivityFragment.class.getSimpleName();
+
     private ArrayAdapter<Track> mTracksAdapter;
     private View mRootView;
     private SpotifyService mSpotify;
     private String artistId;
-    private String artistName;
 
+    private ProgressDialog progress;
 
     public ArtistTopTracksActivityFragment() {
     }
@@ -59,7 +62,6 @@ public class ArtistTopTracksActivityFragment extends Fragment {
 
         Intent intent = getActivity().getIntent();
         artistId = intent.getStringExtra(getString(R.string.extra_artist_id));
-        artistName = intent.getStringExtra(getString(R.string.extra_artist_name));
 
         initTracksListView();
         loadTopTracks(artistId);
@@ -90,11 +92,13 @@ public class ArtistTopTracksActivityFragment extends Fragment {
         Map<String, Object> options = new HashMap<>();
         options.put(SpotifyService.COUNTRY, getCountry());
 
+        progress = ProgressDialog.show(getActivity(), getString(R.string.top_tracks_loading_title), getString(R.string.top_tracks_loading_description), true);
         mSpotify.getArtistTopTrack(artistId, options, new Callback<Tracks>() {
             @Override
             public void success(final Tracks tracks, Response response) {
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
+                        progress.dismiss();
                         mTracksAdapter.clear();
                         for (Track track : tracks.tracks) {
                             mTracksAdapter.add(track);
@@ -105,6 +109,7 @@ public class ArtistTopTracksActivityFragment extends Fragment {
 
             @Override
             public void failure(RetrofitError error) {
+                progress.dismiss();
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
                         Toast.makeText(getActivity(), "Failed to retrieve top tracks.", Toast.LENGTH_SHORT).show();
