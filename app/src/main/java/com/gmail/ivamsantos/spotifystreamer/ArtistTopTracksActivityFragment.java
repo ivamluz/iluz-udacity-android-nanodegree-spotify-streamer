@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +39,7 @@ public class ArtistTopTracksActivityFragment extends Fragment {
     private View mRootView;
     private SpotifyService mSpotify;
     private String artistId;
+    private String artistName;
 
     private ProgressDialog progress;
 
@@ -62,11 +65,20 @@ public class ArtistTopTracksActivityFragment extends Fragment {
 
         Intent intent = getActivity().getIntent();
         artistId = intent.getStringExtra(getString(R.string.extra_artist_id));
+        artistName = intent.getStringExtra(getString(R.string.extra_artist_name));
 
+        setupActionBar();
         initTracksListView();
         loadTopTracks(artistId);
 
         return mRootView;
+    }
+
+    private void setupActionBar() {
+        // http://www.slideshare.net/cbeyls/android-32084115 (slide 13)
+        ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setSubtitle(artistName);
     }
 
     private void initTracksListView() {

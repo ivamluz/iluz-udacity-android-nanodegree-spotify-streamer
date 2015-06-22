@@ -20,7 +20,8 @@
         </activity>
         <activity
             android:name=".ArtistTopTracksActivity"
-            android:label="@string/title_activity_artist_top_tracks"></activity>
+            android:label="@string/title_activity_artist_top_tracks"
+            android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>

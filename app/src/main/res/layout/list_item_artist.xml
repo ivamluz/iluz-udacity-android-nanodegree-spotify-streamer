@@ -21,6 +21,6 @@
         android:text="Artist Name"
         android:textColor="#606060"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="16dp"/>
+        android:layout_marginLeft="16dp" />
 
 </LinearLayout>
