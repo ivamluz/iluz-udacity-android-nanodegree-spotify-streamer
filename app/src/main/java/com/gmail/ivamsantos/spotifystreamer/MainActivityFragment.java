@@ -13,7 +13,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,9 +31,11 @@ import retrofit.client.Response;
 
 
 /**
- * A placeholder fragment containing a simple view.
+ * Main fragment for searching artists.
  */
 public class MainActivityFragment extends Fragment {
+    public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
+
     private ArrayAdapter<Artist> mArtistsAdapter;
     private View mRootView;
     private SpotifyService mSpotify;
@@ -73,8 +74,7 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void initArtistsSearchBox() {
-        EditText searchBox = (EditText) mRootView.findViewById(R.id.editTextSearchBox);
-        searchBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        searchBox().setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView field, int actionId, KeyEvent event) {
                 boolean handled = false;
@@ -91,6 +91,10 @@ public class MainActivityFragment extends Fragment {
         });
     }
 
+    private TextView searchBox() {
+        return (TextView) mRootView.findViewById(R.id.searchBox);
+    }
+
     private void hideSoftKeyboard(IBinder windowToken) {
         InputMethodManager imm =
                 (InputMethodManager) getActivity().getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -98,14 +102,25 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void searchArtists(final String searchTerm) {
+        setUiSearchingState();
+
         mSpotify.searchArtists(searchTerm, new Callback<ArtistsPager>() {
             @Override
             public void success(final ArtistsPager artistsPager, Response response) {
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        mArtistsAdapter.clear();
-                        for (Artist artist : artistsPager.artists.items) {
-                            mArtistsAdapter.add(artist);
+                        hideProgressBar();
+
+                        boolean hasItems = (artistsPager.artists.items.size() > 0);
+                        if (hasItems) {
+                            showResultsList();
+
+                            mArtistsAdapter.clear();
+                            for (Artist artist : artistsPager.artists.items) {
+                                mArtistsAdapter.add(artist);
+                            }
+                        } else {
+                            showNoResultsMessage();
                         }
                     }
                 });
@@ -113,6 +128,9 @@ public class MainActivityFragment extends Fragment {
 
             @Override
             public void failure(RetrofitError error) {
+                hideProgressBar();
+                // showErrorMessage();
+
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
                         Toast.makeText(getActivity(), "Failed to search for '" + searchTerm + "'", Toast.LENGTH_SHORT).show();
@@ -120,6 +138,12 @@ public class MainActivityFragment extends Fragment {
                 });
             }
         });
+    }
+
+    private void setUiSearchingState() {
+        showProgressBar();
+        hideResultsList();
+        hideNoResultsMessage();
     }
 
     private void initArtistsListView() {
@@ -138,5 +162,41 @@ public class MainActivityFragment extends Fragment {
                 startActivity(showTopTracksIntent);
             }
         });
+    }
+
+    private void showResultsList() {
+        setResultsListVisibility(View.VISIBLE);
+    }
+
+    private void hideResultsList() {
+        setResultsListVisibility(View.GONE);
+    }
+
+    private void setResultsListVisibility(int visibility) {
+        mRootView.findViewById(R.id.listViewArtists).setVisibility(visibility);
+    }
+
+    private void showNoResultsMessage() {
+        setNoResultsMessageVisibility(View.VISIBLE);
+    }
+
+    private void hideNoResultsMessage() {
+        setNoResultsMessageVisibility(View.GONE);
+    }
+
+    private void setNoResultsMessageVisibility(int visibility) {
+        mRootView.findViewById(R.id.noResultsMessage).setVisibility(visibility);
+    }
+
+    private void showProgressBar() {
+        setProgressBarVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        setProgressBarVisibility(View.GONE);
+    }
+
+    private void setProgressBarVisibility(int visibility) {
+        mRootView.findViewById(R.id.searchProgressBar).setVisibility(visibility);
     }
 }
