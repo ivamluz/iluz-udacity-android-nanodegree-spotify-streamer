@@ -20,6 +20,8 @@ import android.widget.Toast;
 import com.gmail.ivamsantos.spotifystreamer.adapter.ArtistAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
@@ -35,6 +37,7 @@ import retrofit.client.Response;
  */
 public class MainActivityFragment extends Fragment {
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
+    public static final int SEARCH_LIMIT = 50;
 
     private ArrayAdapter<Artist> mArtistsAdapter;
     private View mRootView;
@@ -104,7 +107,9 @@ public class MainActivityFragment extends Fragment {
     private void searchArtists(final String searchTerm) {
         setUiSearchingState();
 
-        mSpotify.searchArtists(searchTerm, new Callback<ArtistsPager>() {
+        Map<String, Object> options = new HashMap<>();
+        options.put(SpotifyService.LIMIT, SEARCH_LIMIT);
+        mSpotify.searchArtists(searchTerm, options, new Callback<ArtistsPager>() {
             @Override
             public void success(final ArtistsPager artistsPager, Response response) {
                 getActivity().runOnUiThread(new Runnable() {
