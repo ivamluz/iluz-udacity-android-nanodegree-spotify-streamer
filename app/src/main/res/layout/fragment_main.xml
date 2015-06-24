@@ -27,7 +27,7 @@
         android:id="@+id/listViewArtists"
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <ProgressBar
         android:layout_width="64dp"

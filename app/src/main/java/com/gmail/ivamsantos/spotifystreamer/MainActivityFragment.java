@@ -44,6 +44,8 @@ public class MainActivityFragment extends Fragment {
     private View mRootView;
     private SpotifyService mSpotify;
 
+    private boolean isResultsListDirty = false;
+
     public MainActivityFragment() {
 
     }
@@ -69,7 +71,9 @@ public class MainActivityFragment extends Fragment {
         initArtistsSearchBox();
         initArtistsListView();
 
-        loadInitialArtists();
+        if (!isResultsListDirty) {
+            loadInitialArtists();
+        }
 
         return mRootView;
     }
@@ -112,6 +116,8 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void searchArtists(final String searchTerm) {
+        isResultsListDirty = true;
+
         setUiSearchingState();
 
         Map<String, Object> options = new HashMap<>();
@@ -141,11 +147,10 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void failure(RetrofitError error) {
                 hideProgressBar();
-                // showErrorMessage();
 
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(getActivity(), "Failed to search for '" + searchTerm + "'", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Failed to search for '" + searchTerm + "'. Please, try again.", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
