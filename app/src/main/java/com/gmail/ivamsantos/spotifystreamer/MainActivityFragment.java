@@ -38,6 +38,7 @@ import retrofit.client.Response;
 public class MainActivityFragment extends Fragment {
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
     public static final int SEARCH_LIMIT = 50;
+    public static final String INITIAL_SEARCH_TERM = "a";
 
     private ArrayAdapter<Artist> mArtistsAdapter;
     private View mRootView;
@@ -68,7 +69,13 @@ public class MainActivityFragment extends Fragment {
         initArtistsSearchBox();
         initArtistsListView();
 
+        loadInitialArtists();
+
         return mRootView;
+    }
+
+    private void loadInitialArtists() {
+        searchArtists(INITIAL_SEARCH_TERM);
     }
 
     private void initSpotifyService() {
