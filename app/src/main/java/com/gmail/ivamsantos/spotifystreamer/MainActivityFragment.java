@@ -146,10 +146,9 @@ public class MainActivityFragment extends Fragment {
 
             @Override
             public void failure(RetrofitError error) {
-                hideProgressBar();
-
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
+                        hideProgressBar();
                         Toast.makeText(getActivity(), "Failed to search for '" + searchTerm + "'. Please, try again.", Toast.LENGTH_SHORT).show();
                     }
                 });
