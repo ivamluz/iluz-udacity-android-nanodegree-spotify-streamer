@@ -128,6 +128,7 @@ public class ArtistTopTracksActivityFragment extends Fragment {
             public void failure(RetrofitError error) {
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
+                        hideProgressBar();
                         Toast.makeText(getActivity(), R.string.top_tracks_loading_failure_message, Toast.LENGTH_SHORT).show();
                     }
                 });
