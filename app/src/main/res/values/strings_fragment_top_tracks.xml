@@ -2,4 +2,6 @@
 <resources>
     <string name="top_tracks_loading_title">Artist top tracks</string>
     <string name="top_tracks_loading_description">Loading. Please wait...</string>
+    <string name="top_tracks_loading_failure_message">Failed to retrieve top tracks.</string>
+    <string name="top_tracks_no_tracks_message">There are no tracks available for this artist.</string>
 </resources>

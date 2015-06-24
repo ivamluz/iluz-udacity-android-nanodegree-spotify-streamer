@@ -1,6 +1,5 @@
 package com.gmail.ivamsantos.spotifystreamer;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -40,8 +39,6 @@ public class ArtistTopTracksActivityFragment extends Fragment {
     private SpotifyService mSpotify;
     private String artistId;
     private String artistName;
-
-    private ProgressDialog progress;
 
     public ArtistTopTracksActivityFragment() {
     }
@@ -101,19 +98,27 @@ public class ArtistTopTracksActivityFragment extends Fragment {
     }
 
     private void loadTopTracks(final String artistId) {
+        setUiLoadingTracksState();
+
         Map<String, Object> options = new HashMap<>();
         options.put(SpotifyService.COUNTRY, getCountry());
-
-        progress = ProgressDialog.show(getActivity(), getString(R.string.top_tracks_loading_title), getString(R.string.top_tracks_loading_description), true);
         mSpotify.getArtistTopTrack(artistId, options, new Callback<Tracks>() {
             @Override
             public void success(final Tracks tracks, Response response) {
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        progress.dismiss();
-                        mTracksAdapter.clear();
-                        for (Track track : tracks.tracks) {
-                            mTracksAdapter.add(track);
+                        hideProgressBar();
+
+                        boolean hasItems = (tracks.tracks.size() > 0);
+                        if (hasItems) {
+                            showTracksList();
+
+                            mTracksAdapter.clear();
+                            for (Track track : tracks.tracks) {
+                                mTracksAdapter.add(track);
+                            }
+                        } else {
+                            showNoTracksMessage();
                         }
                     }
                 });
@@ -121,10 +126,9 @@ public class ArtistTopTracksActivityFragment extends Fragment {
 
             @Override
             public void failure(RetrofitError error) {
-                progress.dismiss();
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        Toast.makeText(getActivity(), "Failed to retrieve top tracks.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), R.string.top_tracks_loading_failure_message, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -133,5 +137,47 @@ public class ArtistTopTracksActivityFragment extends Fragment {
 
     private String getCountry() {
         return getActivity().getApplicationContext().getResources().getConfiguration().locale.getCountry();
+    }
+
+    public void setUiLoadingTracksState() {
+        hideTracksList();
+        hideNoTracksMessage();
+        showProgressBar();
+    }
+
+    private void showTracksList() {
+        setTracksListVisibility(View.VISIBLE);
+    }
+
+    private void hideTracksList() {
+        setTracksListVisibility(View.GONE);
+    }
+
+    private void setTracksListVisibility(int visibility) {
+        mRootView.findViewById(R.id.listViewTopTracks).setVisibility(visibility);
+    }
+
+    private void showNoTracksMessage() {
+        setNoTracksMessageVisibility(View.VISIBLE);
+    }
+
+    private void hideNoTracksMessage() {
+        setNoTracksMessageVisibility(View.GONE);
+    }
+
+    private void setNoTracksMessageVisibility(int visibility) {
+        mRootView.findViewById(R.id.noTracksMessage).setVisibility(visibility);
+    }
+
+    private void showProgressBar() {
+        setProgressBarVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        setProgressBarVisibility(View.GONE);
+    }
+
+    private void setProgressBarVisibility(int visibility) {
+        mRootView.findViewById(R.id.loadTracksProgressBar).setVisibility(visibility);
     }
 }
