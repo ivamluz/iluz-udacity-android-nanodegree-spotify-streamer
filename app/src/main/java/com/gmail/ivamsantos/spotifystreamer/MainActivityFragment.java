@@ -2,9 +2,11 @@ package com.gmail.ivamsantos.spotifystreamer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,21 +17,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gmail.ivamsantos.spotifystreamer.adapter.ArtistAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
-import kaaes.spotify.webapi.android.models.ArtistsPager;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 
 /**
@@ -68,8 +64,8 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        initArtistsSearchBox();
-        initArtistsListView();
+        setupArtistsSearchBox();
+        setupArtistsListView();
 
         if (!isResultsListDirty) {
             loadInitialArtists();
@@ -79,7 +75,7 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void loadInitialArtists() {
-        searchArtists(INITIAL_SEARCH_TERM);
+        new SearchArtistsTask().execute(INITIAL_SEARCH_TERM);
     }
 
     private void initSpotifyService() {
@@ -87,14 +83,14 @@ public class MainActivityFragment extends Fragment {
         mSpotify = api.getService();
     }
 
-    private void initArtistsSearchBox() {
+    private void setupArtistsSearchBox() {
         searchBox().setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView field, int actionId, KeyEvent event) {
                 boolean handled = false;
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    String searchTerm = field.getText().toString();
-                    searchArtists(searchTerm);
+                    String searchTerms = field.getText().toString();
+                    new SearchArtistsTask().execute(searchTerms);
 
                     hideSoftKeyboard(field.getWindowToken());
 
@@ -115,54 +111,13 @@ public class MainActivityFragment extends Fragment {
         imm.hideSoftInputFromWindow(windowToken, 0);
     }
 
-    private void searchArtists(final String searchTerm) {
-        isResultsListDirty = true;
-
-        setUiSearchingState();
-
-        Map<String, Object> options = new HashMap<>();
-        options.put(SpotifyService.LIMIT, SEARCH_LIMIT);
-        mSpotify.searchArtists(searchTerm, options, new Callback<ArtistsPager>() {
-            @Override
-            public void success(final ArtistsPager artistsPager, Response response) {
-                getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        hideProgressBar();
-
-                        boolean hasItems = (artistsPager.artists.items.size() > 0);
-                        if (hasItems) {
-                            showResultsList();
-
-                            mArtistsAdapter.clear();
-                            for (Artist artist : artistsPager.artists.items) {
-                                mArtistsAdapter.add(artist);
-                            }
-                        } else {
-                            showNoResultsMessage();
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        hideProgressBar();
-                        Toast.makeText(getActivity(), "Failed to search for '" + searchTerm + "'. Please, try again.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-    }
-
     private void setUiSearchingState() {
         showProgressBar();
         hideResultsList();
         hideNoResultsMessage();
     }
 
-    private void initArtistsListView() {
+    private void setupArtistsListView() {
         ListView listView = (ListView) mRootView.findViewById(R.id.listViewArtists);
         listView.setAdapter(mArtistsAdapter);
 
@@ -214,5 +169,50 @@ public class MainActivityFragment extends Fragment {
 
     private void setProgressBarVisibility(int visibility) {
         mRootView.findViewById(R.id.searchProgressBar).setVisibility(visibility);
+    }
+
+
+    private class SearchArtistsTask extends AsyncTask<String, Integer, List<Artist>> {
+        private final String LOG_TAG = SearchArtistsTask.class.getSimpleName();
+
+        @Override
+        protected void onPreExecute() {
+            isResultsListDirty = true;
+            setUiSearchingState();
+            Log.d(LOG_TAG, "Entering onPreExecute().");
+        }
+
+        @Override
+        protected List<Artist> doInBackground(String... params) {
+            boolean isSearchTermsEmpty = (params == null) || (params.length == 0);
+            if (isSearchTermsEmpty) {
+                Log.d(LOG_TAG, "Search term is empty. Skipping doInBackground().");
+                return null;
+            }
+
+            String searchTerms = params[0];
+            List<Artist> artists = mSpotify.searchArtists(searchTerms).artists.items;
+            Log.d(LOG_TAG, "Found " + artists.size() + ": " + artists.toString());
+
+            return artists;
+        }
+
+        @Override
+        protected void onPostExecute(List<Artist> artists) {
+            Log.d(LOG_TAG, "Entering onPostExecute().");
+
+            hideProgressBar();
+
+            if (!artists.isEmpty()) {
+                showResultsList();
+
+                mArtistsAdapter.clear();
+                for (Artist artist : artists) {
+                    mArtistsAdapter.add(artist);
+                }
+            } else {
+                showNoResultsMessage();
+            }
+        }
     }
 }
