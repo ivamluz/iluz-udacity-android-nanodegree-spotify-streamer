@@ -21,7 +21,9 @@ import android.widget.TextView;
 import com.gmail.ivamsantos.spotifystreamer.adapter.ArtistAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
@@ -118,7 +120,7 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void setupArtistsListView() {
-        ListView listView = (ListView) mRootView.findViewById(R.id.listViewArtists);
+        ListView listView = artistsList();
         listView.setAdapter(mArtistsAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -144,7 +146,11 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void setResultsListVisibility(int visibility) {
-        mRootView.findViewById(R.id.listViewArtists).setVisibility(visibility);
+        artistsList().setVisibility(visibility);
+    }
+
+    private ListView artistsList() {
+        return (ListView) mRootView.findViewById(R.id.listViewArtists);
     }
 
     private void showNoResultsMessage() {
@@ -191,8 +197,11 @@ public class MainActivityFragment extends Fragment {
             }
 
             String searchTerms = params[0];
-            List<Artist> artists = mSpotify.searchArtists(searchTerms).artists.items;
-            Log.d(LOG_TAG, "Found " + artists.size() + ": " + artists.toString());
+            Map<String, Object> options = new HashMap<>();
+            options.put(SpotifyService.LIMIT, SEARCH_LIMIT);
+
+            List<Artist> artists = mSpotify.searchArtists(searchTerms, options).artists.items;
+            Log.d(LOG_TAG, "Found " + artists.size() + " artists.");
 
             return artists;
         }
@@ -203,16 +212,18 @@ public class MainActivityFragment extends Fragment {
 
             hideProgressBar();
 
-            if (!artists.isEmpty()) {
-                showResultsList();
-
-                mArtistsAdapter.clear();
-                for (Artist artist : artists) {
-                    mArtistsAdapter.add(artist);
-                }
-            } else {
+            if (artists.isEmpty()) {
                 showNoResultsMessage();
+                return;
             }
+
+            mArtistsAdapter.clear();
+            for (Artist artist : artists) {
+                mArtistsAdapter.add(artist);
+            }
+
+            artistsList().smoothScrollToPosition(0);
+            showResultsList();
         }
     }
 }

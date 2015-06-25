@@ -1,10 +1,12 @@
 package com.gmail.ivamsantos.spotifystreamer;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +19,12 @@ import com.gmail.ivamsantos.spotifystreamer.adapter.TrackAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Track;
-import kaaes.spotify.webapi.android.models.Tracks;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 
 /**
@@ -65,8 +64,8 @@ public class ArtistTopTracksActivityFragment extends Fragment {
         artistName = intent.getStringExtra(getString(R.string.extra_artist_name));
 
         setupActionBar();
-        initTracksListView();
-        loadTopTracks(artistId);
+        setupTracksListView();
+        new LoadTopTracksTask().execute();
 
         return mRootView;
     }
@@ -78,7 +77,7 @@ public class ArtistTopTracksActivityFragment extends Fragment {
         actionBar.setSubtitle(artistName);
     }
 
-    private void initTracksListView() {
+    private void setupTracksListView() {
         ListView listView = (ListView) mRootView.findViewById(R.id.listViewTopTracks);
         listView.setAdapter(mTracksAdapter);
 
@@ -95,49 +94,6 @@ public class ArtistTopTracksActivityFragment extends Fragment {
     private void initSpotifyService() {
         SpotifyApi api = new SpotifyApi();
         mSpotify = api.getService();
-    }
-
-    private void loadTopTracks(final String artistId) {
-        setUiLoadingTracksState();
-
-        Map<String, Object> options = new HashMap<>();
-        options.put(SpotifyService.COUNTRY, getCountry());
-        mSpotify.getArtistTopTrack(artistId, options, new Callback<Tracks>() {
-            @Override
-            public void success(final Tracks tracks, Response response) {
-                getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        hideProgressBar();
-
-                        boolean hasItems = (tracks.tracks.size() > 0);
-                        if (hasItems) {
-                            showTracksList();
-
-                            mTracksAdapter.clear();
-                            for (Track track : tracks.tracks) {
-                                mTracksAdapter.add(track);
-                            }
-                        } else {
-                            showNoTracksMessage();
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        hideProgressBar();
-                        Toast.makeText(getActivity(), R.string.top_tracks_loading_failure_message, Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-    }
-
-    private String getCountry() {
-        return getActivity().getApplicationContext().getResources().getConfiguration().locale.getCountry();
     }
 
     public void setUiLoadingTracksState() {
@@ -180,5 +136,49 @@ public class ArtistTopTracksActivityFragment extends Fragment {
 
     private void setProgressBarVisibility(int visibility) {
         mRootView.findViewById(R.id.loadTracksProgressBar).setVisibility(visibility);
+    }
+
+    private String getCountry() {
+        return getActivity().getApplicationContext().getResources().getConfiguration().locale.getCountry();
+    }
+
+
+    private class LoadTopTracksTask extends AsyncTask<Void, Void, List<Track>> {
+        private final String LOG_TAG = LoadTopTracksTask.class.getSimpleName();
+
+        @Override
+        protected void onPreExecute() {
+            setUiLoadingTracksState();
+            Log.d(LOG_TAG, "Entering onPreExecute().");
+        }
+
+        @Override
+        protected List<Track> doInBackground(Void... params) {
+            Map<String, Object> options = new HashMap<>();
+            options.put(SpotifyService.COUNTRY, getCountry());
+
+            List<Track> tracks = mSpotify.getArtistTopTrack(artistId, options).tracks;
+            Log.d(LOG_TAG, "Found " + tracks.size() + " tracks.");
+
+            return tracks;
+        }
+
+        @Override
+        protected void onPostExecute(List<Track> tracks) {
+            Log.d(LOG_TAG, "Entering onPostExecute().");
+
+            hideProgressBar();
+
+            if (tracks.isEmpty()) {
+                showNoTracksMessage();
+                return;
+            }
+
+            showTracksList();
+            mTracksAdapter.clear();
+            for (Track track : tracks) {
+                mTracksAdapter.add(track);
+            }
+        }
     }
 }
