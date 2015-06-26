@@ -1,4 +1,5 @@
 <resources>
     <string name="search_box_hint">Search for an artist or band...</string>
     <string name="empty_search_results_message">There are no results available.</string>
+    <string name="search_failure_message">Failed to search for artists. Please, try again.</string>
 </resources>

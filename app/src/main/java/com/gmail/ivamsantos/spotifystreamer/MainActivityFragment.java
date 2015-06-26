@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gmail.ivamsantos.spotifystreamer.adapter.ArtistAdapter;
 
@@ -200,8 +201,13 @@ public class MainActivityFragment extends Fragment {
             Map<String, Object> options = new HashMap<>();
             options.put(SpotifyService.LIMIT, SEARCH_LIMIT);
 
-            List<Artist> artists = mSpotify.searchArtists(searchTerms, options).artists.items;
-            Log.d(LOG_TAG, "Found " + artists.size() + " artists.");
+            List<Artist> artists = null;
+            try {
+                artists = mSpotify.searchArtists(searchTerms, options).artists.items;
+                Log.d(LOG_TAG, "Found " + artists.size() + " artists.");
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "Failed to search artists with error: " + e.getMessage());
+            }
 
             return artists;
         }
@@ -212,11 +218,21 @@ public class MainActivityFragment extends Fragment {
 
             hideProgressBar();
 
-            if (artists.isEmpty()) {
-                showNoResultsMessage();
+            if (artists == null) {
+                Log.d(LOG_TAG, "artists is null. An exception probably happened while contacting Spotify services.");
+                Toast.makeText(getActivity(), getString(R.string.search_failure_message), Toast.LENGTH_SHORT).show();
+
                 return;
             }
 
+            if (artists.isEmpty()) {
+                Log.d(LOG_TAG, "artists is empty.");
+                showNoResultsMessage();
+
+                return;
+            }
+
+            Log.d(LOG_TAG, "Found " + artists.size() + " artists. Updating mArtistsAdapter.");
             mArtistsAdapter.clear();
             for (Artist artist : artists) {
                 mArtistsAdapter.add(artist);

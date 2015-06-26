@@ -157,8 +157,13 @@ public class ArtistTopTracksActivityFragment extends Fragment {
             Map<String, Object> options = new HashMap<>();
             options.put(SpotifyService.COUNTRY, getCountry());
 
-            List<Track> tracks = mSpotify.getArtistTopTrack(artistId, options).tracks;
-            Log.d(LOG_TAG, "Found " + tracks.size() + " tracks.");
+            List<Track> tracks = null;
+            try {
+                tracks = mSpotify.getArtistTopTrack(artistId, options).tracks;
+                Log.d(LOG_TAG, "Found " + tracks.size() + " tracks.");
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "Failed to load tracks with error: " + e.getMessage());
+            }
 
             return tracks;
         }
@@ -169,16 +174,24 @@ public class ArtistTopTracksActivityFragment extends Fragment {
 
             hideProgressBar();
 
+            if (tracks == null) {
+                Log.d(LOG_TAG, "tracks is null. An exception probably happened while contacting Spotify services.");
+                Toast.makeText(getActivity(), getString(R.string.top_tracks_loading_failure_message), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             if (tracks.isEmpty()) {
+                Log.d(LOG_TAG, "tracks is empty.");
                 showNoTracksMessage();
                 return;
             }
 
-            showTracksList();
+            Log.d(LOG_TAG, "Found " + tracks.size() + " artists. Updating mArtistsAdapter.");
             mTracksAdapter.clear();
             for (Track track : tracks) {
                 mTracksAdapter.add(track);
             }
+            showTracksList();
         }
     }
 }

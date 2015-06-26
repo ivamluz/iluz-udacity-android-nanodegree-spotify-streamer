@@ -27,6 +27,8 @@ public class SpotifyImageHelper {
             }
         }
 
+        // Fallback. Only get image at 0th if no image with at least MINIMUM_PREFERRED_IMAGE_WIDTH
+        // was found.
         if (image == null) {
             image = images.get(0);
         }
