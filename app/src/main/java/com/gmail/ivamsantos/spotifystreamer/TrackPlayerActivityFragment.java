@@ -1,12 +1,10 @@
 package com.gmail.ivamsantos.spotifystreamer;
 
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -115,10 +113,12 @@ public class TrackPlayerActivityFragment extends Fragment {
                 if (isPlaying) {
                     // http://stackoverflow.com/a/8354606
                     playImageButton.setImageResource(android.R.drawable.ic_media_pause);
-                    Toast.makeText(getActivity(), "Playing track.", Toast.LENGTH_SHORT).show();;
+                    Toast.makeText(getActivity(), "Playing track.", Toast.LENGTH_SHORT).show();
+                    ;
                 } else {
                     playImageButton.setImageResource(android.R.drawable.ic_media_play);
-                    Toast.makeText(getActivity(), "Paused track.", Toast.LENGTH_SHORT).show();;
+                    Toast.makeText(getActivity(), "Paused track.", Toast.LENGTH_SHORT).show();
+                    ;
                 }
             }
         });
@@ -129,7 +129,8 @@ public class TrackPlayerActivityFragment extends Fragment {
         nextImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Moving to next track.", Toast.LENGTH_SHORT).show();;
+                Toast.makeText(getActivity(), "Moving to next track.", Toast.LENGTH_SHORT).show();
+                ;
             }
         });
     }
