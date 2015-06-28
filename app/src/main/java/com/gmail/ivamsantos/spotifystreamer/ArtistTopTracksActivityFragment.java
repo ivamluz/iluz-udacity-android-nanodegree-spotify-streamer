@@ -36,8 +36,8 @@ public class ArtistTopTracksActivityFragment extends Fragment {
     private ArrayAdapter<Track> mTracksAdapter;
     private View mRootView;
     private SpotifyService mSpotify;
-    private String artistId;
-    private String artistName;
+    private String mArtistId;
+    private String mArtistName;
 
     public ArtistTopTracksActivityFragment() {
     }
@@ -59,9 +59,7 @@ public class ArtistTopTracksActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_artist_top_tracks, container, false);
 
-        Intent intent = getActivity().getIntent();
-        artistId = intent.getStringExtra(getString(R.string.extra_artist_id));
-        artistName = intent.getStringExtra(getString(R.string.extra_artist_name));
+        loadValuesFromIntent();
 
         setupActionBar();
         setupTracksListView();
@@ -70,11 +68,17 @@ public class ArtistTopTracksActivityFragment extends Fragment {
         return mRootView;
     }
 
+    private void loadValuesFromIntent() {
+        Intent intent = getActivity().getIntent();
+        mArtistId = intent.getStringExtra(getString(R.string.extra_artist_id));
+        mArtistName = intent.getStringExtra(getString(R.string.extra_artist_name));
+    }
+
     private void setupActionBar() {
         // http://www.slideshare.net/cbeyls/android-32084115 (slide 13)
         ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setSubtitle(artistName);
+        actionBar.setSubtitle(mArtistName);
     }
 
     private void setupTracksListView() {
@@ -85,8 +89,21 @@ public class ArtistTopTracksActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Track track = mTracksAdapter.getItem(position);
-                String toastContent = track.name + " - " + track.album.name;
-                Toast.makeText(getActivity().getApplicationContext(), toastContent, Toast.LENGTH_SHORT).show();
+
+                Intent showTopTracksIntent = new Intent(getActivity(), TrackPlayerActivity.class);
+                showTopTracksIntent.putExtra(getString(R.string.extra_artist_name), mArtistName);
+                showTopTracksIntent.putExtra(getString(R.string.extra_track_id), track.id);
+                showTopTracksIntent.putExtra(getString(R.string.extra_track_name), track.name);
+                showTopTracksIntent.putExtra(getString(R.string.extra_track_duration), track.duration_ms);
+                showTopTracksIntent.putExtra(getString(R.string.extra_album_name), track.album.name);
+
+                String imageUrl = null;
+                if (!track.album.images.isEmpty()) {
+                    imageUrl = track.album.images.get(0).url;
+                }
+                showTopTracksIntent.putExtra(getString(R.string.extra_album_image), imageUrl);
+
+                startActivity(showTopTracksIntent);
             }
         });
     }
@@ -159,7 +176,7 @@ public class ArtistTopTracksActivityFragment extends Fragment {
 
             List<Track> tracks = null;
             try {
-                tracks = mSpotify.getArtistTopTrack(artistId, options).tracks;
+                tracks = mSpotify.getArtistTopTrack(mArtistId, options).tracks;
                 Log.d(LOG_TAG, "Found " + tracks.size() + " tracks.");
             } catch (Exception e) {
                 Log.e(LOG_TAG, "Failed to load tracks with error: " + e.getMessage());
