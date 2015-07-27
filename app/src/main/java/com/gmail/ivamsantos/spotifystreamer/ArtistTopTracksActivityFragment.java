@@ -39,6 +39,8 @@ public class ArtistTopTracksActivityFragment extends Fragment {
     private String mArtistId;
     private String mArtistName;
 
+    private ArrayList<Track> tracks;
+
     public ArtistTopTracksActivityFragment() {
     }
 
@@ -48,7 +50,7 @@ public class ArtistTopTracksActivityFragment extends Fragment {
 
         setRetainInstance(true);
 
-        ArrayList<Track> tracks = new ArrayList<>();
+        tracks = new ArrayList<>();
         mTracksAdapter = new TrackAdapter(getActivity().getApplicationContext(), tracks);
 
         initSpotifyService();
@@ -92,16 +94,8 @@ public class ArtistTopTracksActivityFragment extends Fragment {
 
                 Intent showTopTracksIntent = new Intent(getActivity(), TrackPlayerActivity.class);
                 showTopTracksIntent.putExtra(getString(R.string.extra_artist_name), mArtistName);
-                showTopTracksIntent.putExtra(getString(R.string.extra_track_id), track.id);
-                showTopTracksIntent.putExtra(getString(R.string.extra_track_name), track.name);
-                showTopTracksIntent.putExtra(getString(R.string.extra_track_duration), track.duration_ms);
-                showTopTracksIntent.putExtra(getString(R.string.extra_album_name), track.album.name);
-
-                String imageUrl = null;
-                if (!track.album.images.isEmpty()) {
-                    imageUrl = track.album.images.get(0).url;
-                }
-                showTopTracksIntent.putExtra(getString(R.string.extra_album_image), imageUrl);
+                showTopTracksIntent.putExtra(getString(R.string.extra_track_index), position);
+                showTopTracksIntent.putExtra(getString(R.string.extra_tracks), tracks);
 
                 startActivity(showTopTracksIntent);
             }
@@ -160,7 +154,7 @@ public class ArtistTopTracksActivityFragment extends Fragment {
     }
 
 
-    private class LoadTopTracksTask extends AsyncTask<Void, Void, List<Track>> {
+    private class LoadTopTracksTask extends AsyncTask<Void, Void, ArrayList<Track>> {
         private final String LOG_TAG = LoadTopTracksTask.class.getSimpleName();
 
         @Override
@@ -170,13 +164,10 @@ public class ArtistTopTracksActivityFragment extends Fragment {
         }
 
         @Override
-        protected List<Track> doInBackground(Void... params) {
-            Map<String, Object> options = new HashMap<>();
-            options.put(SpotifyService.COUNTRY, getCountry());
-
-            List<Track> tracks = null;
+        protected ArrayList<Track> doInBackground(Void... params) {
+//            List<Track> tracks = new ArrayList<>();
             try {
-                tracks = mSpotify.getArtistTopTrack(mArtistId, options).tracks;
+                tracks = new ArrayList<>(mSpotify.getArtistTopTrack(mArtistId, getCountry()).tracks);
                 Log.d(LOG_TAG, "Found " + tracks.size() + " tracks.");
             } catch (Exception e) {
                 Log.e(LOG_TAG, "Failed to load tracks with error: " + e.getMessage());
@@ -186,7 +177,7 @@ public class ArtistTopTracksActivityFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(List<Track> tracks) {
+        protected void onPostExecute(ArrayList<Track> tracks) {
             Log.d(LOG_TAG, "Entering onPostExecute().");
 
             hideProgressBar();
