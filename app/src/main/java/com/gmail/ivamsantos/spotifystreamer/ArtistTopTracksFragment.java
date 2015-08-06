@@ -18,30 +18,42 @@ import android.widget.Toast;
 import com.gmail.ivamsantos.spotifystreamer.adapter.TrackAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.Track;
 
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ArtistTopTracksActivityFragment extends Fragment {
-    public final static String LOG_TAG = ArtistTopTracksActivityFragment.class.getSimpleName();
-
+public class ArtistTopTracksFragment extends Fragment {
+    public static final String TAG = ArtistTopTracksFragment.class.getSimpleName();
+    public static final String ARGUMENT_KEY_ARTIST = "artist";
+    private static final String LOG_TAG = ArtistTopTracksFragment.class.getSimpleName();
     private ArrayAdapter<Track> mTracksAdapter;
     private View mRootView;
     private SpotifyService mSpotify;
-    private String mArtistId;
-    private String mArtistName;
 
-    private ArrayList<Track> tracks;
+    private Artist mArtist;
+    private ArrayList<Track> mTracks;
 
-    public ArtistTopTracksActivityFragment() {
+    public ArtistTopTracksFragment() {
+    }
+
+    public static ArtistTopTracksFragment withArtist(Artist artist) {
+        ArtistTopTracksFragment fragment = new ArtistTopTracksFragment();
+
+        Bundle args = new Bundle();
+        args.putParcelable(ARGUMENT_KEY_ARTIST, artist);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
+    public Artist getArtist() {
+        return mArtist;
     }
 
     @Override
@@ -50,8 +62,8 @@ public class ArtistTopTracksActivityFragment extends Fragment {
 
         setRetainInstance(true);
 
-        tracks = new ArrayList<>();
-        mTracksAdapter = new TrackAdapter(getActivity().getApplicationContext(), tracks);
+        mTracks = new ArrayList<>();
+        mTracksAdapter = new TrackAdapter(getActivity().getApplicationContext(), mTracks);
 
         initSpotifyService();
     }
@@ -61,26 +73,25 @@ public class ArtistTopTracksActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_artist_top_tracks, container, false);
 
-        loadValuesFromIntent();
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mArtist = arguments.getParcelable(ARGUMENT_KEY_ARTIST);
 
-        setupActionBar();
-        setupTracksListView();
-        new LoadTopTracksTask().execute();
+            setupActionBar();
+            setupTracksListView();
+            new LoadTopTracksTask().execute();
+        }
 
         return mRootView;
-    }
-
-    private void loadValuesFromIntent() {
-        Intent intent = getActivity().getIntent();
-        mArtistId = intent.getStringExtra(getString(R.string.extra_artist_id));
-        mArtistName = intent.getStringExtra(getString(R.string.extra_artist_name));
     }
 
     private void setupActionBar() {
         // http://www.slideshare.net/cbeyls/android-32084115 (slide 13)
         ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setSubtitle(mArtistName);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setSubtitle(mArtist.name);
+        }
     }
 
     private void setupTracksListView() {
@@ -90,12 +101,10 @@ public class ArtistTopTracksActivityFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Track track = mTracksAdapter.getItem(position);
-
                 Intent showTopTracksIntent = new Intent(getActivity(), TrackPlayerActivity.class);
-                showTopTracksIntent.putExtra(getString(R.string.extra_artist_name), mArtistName);
+                showTopTracksIntent.putExtra(TrackPlayerFragment.ARGUMENT_KEY_ARTIST, mArtist);
                 showTopTracksIntent.putExtra(getString(R.string.extra_track_index), position);
-                showTopTracksIntent.putExtra(getString(R.string.extra_tracks), tracks);
+                showTopTracksIntent.putExtra(getString(R.string.extra_tracks), mTracks);
 
                 startActivity(showTopTracksIntent);
             }
@@ -107,7 +116,7 @@ public class ArtistTopTracksActivityFragment extends Fragment {
         mSpotify = api.getService();
     }
 
-    public void setUiLoadingTracksState() {
+    private void setUiLoadingTracksState() {
         hideTracksList();
         hideNoTracksMessage();
         showProgressBar();
@@ -165,15 +174,14 @@ public class ArtistTopTracksActivityFragment extends Fragment {
 
         @Override
         protected ArrayList<Track> doInBackground(Void... params) {
-//            List<Track> tracks = new ArrayList<>();
             try {
-                tracks = new ArrayList<>(mSpotify.getArtistTopTrack(mArtistId, getCountry()).tracks);
-                Log.d(LOG_TAG, "Found " + tracks.size() + " tracks.");
+                mTracks = new ArrayList<>(mSpotify.getArtistTopTrack(mArtist.id, getCountry()).tracks);
+                Log.d(LOG_TAG, "Found " + mTracks.size() + " mTracks.");
             } catch (Exception e) {
-                Log.e(LOG_TAG, "Failed to load tracks with error: " + e.getMessage());
+                Log.e(LOG_TAG, "Failed to load mTracks with error: " + e.getMessage());
             }
 
-            return tracks;
+            return mTracks;
         }
 
         @Override
@@ -183,18 +191,18 @@ public class ArtistTopTracksActivityFragment extends Fragment {
             hideProgressBar();
 
             if (tracks == null) {
-                Log.d(LOG_TAG, "tracks is null. An exception probably happened while contacting Spotify services.");
+                Log.d(LOG_TAG, "mTracks is null. An exception probably happened while contacting Spotify services.");
                 Toast.makeText(getActivity(), getString(R.string.top_tracks_loading_failure_message), Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (tracks.isEmpty()) {
-                Log.d(LOG_TAG, "tracks is empty.");
+                Log.d(LOG_TAG, "mTracks is empty.");
                 showNoTracksMessage();
                 return;
             }
 
-            Log.d(LOG_TAG, "Found " + tracks.size() + " artists. Updating mArtistsAdapter.");
+            Log.d(LOG_TAG, "Found " + tracks.size() + " artists. Updating mTracksAdapter.");
             mTracksAdapter.clear();
             for (Track track : tracks) {
                 mTracksAdapter.add(track);

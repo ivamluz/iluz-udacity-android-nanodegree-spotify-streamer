@@ -1,7 +1,7 @@
 package com.gmail.ivamsantos.spotifystreamer;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -34,25 +34,26 @@ import kaaes.spotify.webapi.android.models.Artist;
 /**
  * Main fragment for searching artists.
  */
-public class MainActivityFragment extends Fragment {
-    public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
-    public static final int SEARCH_LIMIT = 50;
-    public static final String INITIAL_SEARCH_TERM = "a";
+public class ArtistsFragment extends Fragment {
+    public static final String LOG_TAG = ArtistsFragment.class.getSimpleName();
+    private static final int SEARCH_LIMIT = 50;
+    private static final String INITIAL_SEARCH_TERM = "a";
 
     private ArrayAdapter<Artist> mArtistsAdapter;
     private View mRootView;
     private SpotifyService mSpotify;
 
-    private boolean isResultsListDirty = false;
+    private boolean mIsResultsListDirty = false;
+    private OnArtistSelectedListener mOnArtistSelectedListener;
+    private OnArtistsLoadedListener mOnArtistsLoadedListener;
 
-    public MainActivityFragment() {
+    public ArtistsFragment() {
 
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setRetainInstance(true);
 
         // http://stackoverflow.com/a/28667895
@@ -65,12 +66,12 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mRootView = inflater.inflate(R.layout.fragment_main, container, false);
+        mRootView = inflater.inflate(R.layout.fragment_artists, container, false);
 
         setupArtistsSearchBox();
         setupArtistsListView();
 
-        if (!isResultsListDirty) {
+        if (!mIsResultsListDirty) {
             loadInitialArtists();
         }
 
@@ -128,12 +129,7 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Artist artist = mArtistsAdapter.getItem(position);
-
-                Intent showTopTracksIntent = new Intent(getActivity(), ArtistTopTracksActivity.class);
-                showTopTracksIntent.putExtra(getString(R.string.extra_artist_id), artist.id);
-                showTopTracksIntent.putExtra(getString(R.string.extra_artist_name), artist.name);
-
-                startActivity(showTopTracksIntent);
+                mOnArtistSelectedListener.onArtistSelectedListener(artist);
             }
         });
     }
@@ -178,13 +174,31 @@ public class MainActivityFragment extends Fragment {
         mRootView.findViewById(R.id.searchProgressBar).setVisibility(visibility);
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mOnArtistSelectedListener = (OnArtistSelectedListener) activity;
+            mOnArtistsLoadedListener = (OnArtistsLoadedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnArtistSelectedListener");
+        }
+    }
+
+    public interface OnArtistSelectedListener {
+        void onArtistSelectedListener(Artist artist);
+    }
+
+    public interface OnArtistsLoadedListener {
+        void onArtistsLoadedListener(List<Artist> artists);
+    }
 
     private class SearchArtistsTask extends AsyncTask<String, Integer, List<Artist>> {
         private final String LOG_TAG = SearchArtistsTask.class.getSimpleName();
 
         @Override
         protected void onPreExecute() {
-            isResultsListDirty = true;
+            mIsResultsListDirty = true;
             setUiSearchingState();
             Log.d(LOG_TAG, "Entering onPreExecute().");
         }
@@ -238,7 +252,13 @@ public class MainActivityFragment extends Fragment {
                 mArtistsAdapter.add(artist);
             }
 
-            artistsList().smoothScrollToPosition(0);
+            ListView artistsListView = artistsList();
+            if (!mArtistsAdapter.isEmpty()) {
+                artistsListView.smoothScrollToPosition(0);
+            }
+
+            mOnArtistsLoadedListener.onArtistsLoadedListener(artists);
+
             showResultsList();
         }
     }

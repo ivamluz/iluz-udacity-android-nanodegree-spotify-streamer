@@ -5,6 +5,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import kaaes.spotify.webapi.android.models.Artist;
+
 
 public class ArtistTopTracksActivity extends ActionBarActivity {
     public final static String LOG_TAG = ArtistTopTracksActivity.class.getSimpleName();
@@ -13,6 +15,20 @@ public class ArtistTopTracksActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist_top_tracks);
+
+        if (savedInstanceState == null) {
+            setupTopTracksFragment();
+        }
+    }
+
+    private void setupTopTracksFragment() {
+        Artist artist = getIntent().getParcelableExtra(ArtistTopTracksFragment.ARGUMENT_KEY_ARTIST);
+        ArtistTopTracksFragment fragment = ArtistTopTracksFragment.withArtist(artist);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.artist_top_tracks_container, fragment)
+                .commit();
     }
 
     @Override
@@ -24,9 +40,6 @@ public class ArtistTopTracksActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         switch (id) {
             case R.id.action_settings:

@@ -19,36 +19,43 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
+import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.Track;
 
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class TrackPlayerActivityFragment extends Fragment {
-    public static final String LOG_TAG = TrackPlayerActivityFragment.class.getSimpleName();
+public class TrackPlayerFragment extends Fragment {
+    public static final String LOG_TAG = TrackPlayerFragment.class.getSimpleName();
     public static final int TRACK_INDEX_UNAVAILABLE = -1;
+    public static final String ARGUMENT_KEY_ARTIST = "artist";
 
     boolean isPlaying = false;
     private View mRootView;
-    private String mArtistName;
+    private Artist mArtist;
     private Track mCurrentTrack;
     private Integer mCurrentTrackIndex;
     private ArrayList<Track> mTracks;
+
+    private boolean mIsPaused;
+    private int mCurrentPosition;
 
     private ActionBar mActionBar;
 
     private MediaPlayer mMediaPlayer;
 
-    public TrackPlayerActivityFragment() {
+    public TrackPlayerFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_track_player, container, false);
+
+        mIsPaused = false;
+        mCurrentPosition = 0;
 
         loadValuesFromIntent();
         setupActionBar();
@@ -60,7 +67,7 @@ public class TrackPlayerActivityFragment extends Fragment {
 
     private void loadValuesFromIntent() {
         Intent intent = getActivity().getIntent();
-        mArtistName = intent.getStringExtra(getString(R.string.extra_artist_name));
+        mArtist = intent.getParcelableExtra(ARGUMENT_KEY_ARTIST);
         mTracks = intent.getParcelableArrayListExtra(getString(R.string.extra_tracks));
 
         // FIXME: Handle invalid index
@@ -72,7 +79,7 @@ public class TrackPlayerActivityFragment extends Fragment {
         // http://www.slideshare.net/cbeyls/android-32084115 (slide 13)
         mActionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setTitle(mArtistName);
+        mActionBar.setTitle(mArtist.name);
         mActionBar.setSubtitle(mCurrentTrack.name);
     }
 
@@ -81,12 +88,10 @@ public class TrackPlayerActivityFragment extends Fragment {
         TextView albumNameTextView = (TextView) mRootView.findViewById(R.id.trackPlayerAlbumName);
         TextView trackNameTextView = (TextView) mRootView.findViewById(R.id.trackPlayerTrackName);
         ImageView albumImageImageView = (ImageView) mRootView.findViewById(R.id.trackPlayerAlbumImage);
-        TextView durationTextView = (TextView) mRootView.findViewById(R.id.trackPlayerDuration);
 
-        artistNameTextView.setText(mArtistName);
+        artistNameTextView.setText(mArtist.name);
         albumNameTextView.setText(mCurrentTrack.album.name);
         trackNameTextView.setText(mCurrentTrack.name);
-        durationTextView.setText(getFormattedTrackDuration());
 
         Picasso.with(getActivity())
                 .load(getAlbumImage())
@@ -122,22 +127,23 @@ public class TrackPlayerActivityFragment extends Fragment {
     }
 
     private void setupPlayTrackButton() {
-        final ImageButton playImageButton = (ImageButton) mRootView.findViewById(R.id.trackPlayerPlayButton);
+        final ImageButton playImageButton = playImageButton();
 
         playImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isPlaying = !isPlaying;
                 if (isPlaying) {
-                    // http://stackoverflow.com/a/8354606
-                    playImageButton.setImageResource(android.R.drawable.ic_media_pause);
                     play();
                 } else {
-                    playImageButton.setImageResource(android.R.drawable.ic_media_play);
                     pause();
                 }
             }
         });
+    }
+
+    private ImageButton playImageButton() {
+        return (ImageButton) mRootView.findViewById(R.id.trackPlayerPlayButton);
     }
 
     private void play() {
@@ -152,6 +158,7 @@ public class TrackPlayerActivityFragment extends Fragment {
                 public boolean onError(MediaPlayer mp, int what, int extra) {
                     Toast.makeText(getActivity(), "An error occurred while playing the track.", Toast.LENGTH_SHORT).show();
                     mMediaPlayer.reset();
+                    mIsPaused = false;
                     // ... react appropriately ...
                     // The MediaPlayer has moved to the Error state, must be reset!
                     return false;
@@ -162,6 +169,9 @@ public class TrackPlayerActivityFragment extends Fragment {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     mMediaPlayer.start();
+                    mIsPaused = false;
+                    playImageButton().setImageResource(android.R.drawable.ic_media_pause);
+
                 }
             });
 
@@ -171,6 +181,16 @@ public class TrackPlayerActivityFragment extends Fragment {
                     playNext();
                 }
             });
+        }
+
+        if (mIsPaused) {
+            mIsPaused = false;
+            mMediaPlayer.start();
+            mMediaPlayer.seekTo(mCurrentPosition);
+            playImageButton().setImageResource(android.R.drawable.ic_media_pause);
+
+
+            return;
         }
 
         mMediaPlayer.reset();
@@ -189,7 +209,16 @@ public class TrackPlayerActivityFragment extends Fragment {
     }
 
     private void pause() {
-        Toast.makeText(getActivity(), "Paused track.", Toast.LENGTH_SHORT).show();
+        if (mIsPaused) {
+            return;
+        }
+
+        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+            mIsPaused = true;
+            mCurrentPosition = mMediaPlayer.getCurrentPosition();
+            mMediaPlayer.pause();
+            playImageButton().setImageResource(android.R.drawable.ic_media_play);
+        }
     }
 
     /**
@@ -199,8 +228,7 @@ public class TrackPlayerActivityFragment extends Fragment {
     private void previous() {
         boolean isOnFirstTrack = (mCurrentTrackIndex == 0);
         if (isOnFirstTrack) {
-            int lastIndex = (mTracks.size() - 1);
-            mCurrentTrackIndex = lastIndex;
+            mCurrentTrackIndex = (mTracks.size() - 1);
         } else {
             mCurrentTrackIndex--;
         }
@@ -227,6 +255,8 @@ public class TrackPlayerActivityFragment extends Fragment {
      * new current track.
      */
     private void updateCurrentTrack() {
+        mCurrentPosition = 0;
+        mIsPaused = false;
         mCurrentTrack = mTracks.get(mCurrentTrackIndex);
         setLayoutComponentsValues();
         mActionBar.setSubtitle(mCurrentTrack.name);
@@ -245,14 +275,4 @@ public class TrackPlayerActivityFragment extends Fragment {
             }
         });
     }
-
-    private String getFormattedTrackDuration() {
-        // http://stackoverflow.com/a/625624
-        return String.format("%d:%d",
-                TimeUnit.MILLISECONDS.toMinutes(mCurrentTrack.duration_ms),
-                TimeUnit.MILLISECONDS.toSeconds(mCurrentTrack.duration_ms) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(mCurrentTrack.duration_ms))
-        );
-    }
-
 }

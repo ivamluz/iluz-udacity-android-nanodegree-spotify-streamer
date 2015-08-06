@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="extra_artist_id" translatable="false">artist_id</string>
-    <string name="extra_artist_name" translatable="false">artist_name</string>
-    <!--<string name="extra_track_id" translatable="false">track_id</string>-->
+    <!--<string name="extra_artist" translatable="false">artist</string>-->
+    <!--<string name="extra_artist_id" translatable="false">artist_id</string>-->
+    <!--<string name="extra_artist_name" translatable="false">artist_name</string>-->
     <string name="extra_track_index" translatable="false">track_index</string>
     <string name="extra_tracks" translatable="false">tracks</string>
-    <!--<string name="extra_track_name" translatable="false">track_name</string>-->
-    <!--<string name="extra_track_duration" translatable="false">track_duration</string>-->
-    <!--<string name="extra_album_name" translatable="false">album_name</string>-->
-    <!--<string name="extra_album_image" translatable="false">album_image</string>-->
 </resources>
