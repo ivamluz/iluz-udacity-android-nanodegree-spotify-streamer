@@ -22,10 +22,6 @@ public class MainActivity extends ActionBarActivity implements ArtistsFragment.O
 
     boolean mIsDualPaneLayout;
 
-    {
-
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
