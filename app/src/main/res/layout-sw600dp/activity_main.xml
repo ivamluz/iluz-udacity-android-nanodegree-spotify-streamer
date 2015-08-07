@@ -7,15 +7,14 @@
     android:orientation="horizontal"
     tools:context="com.gmail.ivamsantos.spotifystreamer.MainActivity">
 
-    
+
     <fragment
         android:id="@+id/fragment_artists"
         android:name="com.gmail.ivamsantos.spotifystreamer.ArtistsFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="2"
-        tools:layout="@android:layout/list_content">
-    </fragment>
+        tools:layout="@android:layout/list_content"></fragment>
 
     <FrameLayout
         android:id="@+id/artist_top_tracks_container"

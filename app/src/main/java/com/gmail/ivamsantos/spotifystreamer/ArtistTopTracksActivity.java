@@ -13,7 +13,7 @@ import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.Track;
 
 
-public class ArtistTopTracksActivity extends ActionBarActivity implements ArtistTopTracksFragment.OnTrackSelectedListener{
+public class ArtistTopTracksActivity extends ActionBarActivity implements ArtistTopTracksFragment.OnTrackSelectedListener {
     public final static String LOG_TAG = ArtistTopTracksActivity.class.getSimpleName();
 
     @Override
