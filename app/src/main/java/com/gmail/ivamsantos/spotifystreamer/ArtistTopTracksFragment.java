@@ -1,5 +1,6 @@
 package com.gmail.ivamsantos.spotifystreamer;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.gmail.ivamsantos.spotifystreamer.adapter.TrackAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
@@ -30,7 +32,6 @@ import kaaes.spotify.webapi.android.models.Track;
  */
 public class ArtistTopTracksFragment extends Fragment {
     public static final String TAG = ArtistTopTracksFragment.class.getSimpleName();
-    public static final String ARGUMENT_KEY_ARTIST = "artist";
     private static final String LOG_TAG = ArtistTopTracksFragment.class.getSimpleName();
     private ArrayAdapter<Track> mTracksAdapter;
     private View mRootView;
@@ -39,17 +40,23 @@ public class ArtistTopTracksFragment extends Fragment {
     private Artist mArtist;
     private ArrayList<Track> mTracks;
 
+    private OnTrackSelectedListener mOnTrackSelectedListener;
+
     public ArtistTopTracksFragment() {
     }
 
-    public static ArtistTopTracksFragment withArtist(Artist artist) {
-        ArtistTopTracksFragment fragment = new ArtistTopTracksFragment();
+    public interface OnTrackSelectedListener {
+        void onTrackSelectedListener(Artist artist, List<Track> tracks, int position);
+    }
 
-        Bundle args = new Bundle();
-        args.putParcelable(ARGUMENT_KEY_ARTIST, artist);
-        fragment.setArguments(args);
-
-        return fragment;
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mOnTrackSelectedListener = (OnTrackSelectedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnTrackSelectedListener");
+        }
     }
 
     public Artist getArtist() {
@@ -75,7 +82,7 @@ public class ArtistTopTracksFragment extends Fragment {
 
         Bundle arguments = getArguments();
         if (arguments != null) {
-            mArtist = arguments.getParcelable(ARGUMENT_KEY_ARTIST);
+            mArtist = arguments.getParcelable(getString(R.string.extra_artist));
 
             setupActionBar();
             setupTracksListView();
@@ -101,12 +108,7 @@ public class ArtistTopTracksFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent showTopTracksIntent = new Intent(getActivity(), TrackPlayerActivity.class);
-                showTopTracksIntent.putExtra(TrackPlayerFragment.ARGUMENT_KEY_ARTIST, mArtist);
-                showTopTracksIntent.putExtra(getString(R.string.extra_track_index), position);
-                showTopTracksIntent.putExtra(getString(R.string.extra_tracks), mTracks);
-
-                startActivity(showTopTracksIntent);
+                mOnTrackSelectedListener.onTrackSelectedListener(mArtist, mTracks, position);
             }
         });
     }

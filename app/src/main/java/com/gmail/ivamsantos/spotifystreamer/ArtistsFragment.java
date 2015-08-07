@@ -181,7 +181,7 @@ public class ArtistsFragment extends Fragment {
             mOnArtistSelectedListener = (OnArtistSelectedListener) activity;
             mOnArtistsLoadedListener = (OnArtistsLoadedListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnArtistSelectedListener");
+            throw new ClassCastException(activity.toString() + " must implement both OnArtistSelectedListener and OnArtistsLoadedListener interfaces.");
         }
     }
 

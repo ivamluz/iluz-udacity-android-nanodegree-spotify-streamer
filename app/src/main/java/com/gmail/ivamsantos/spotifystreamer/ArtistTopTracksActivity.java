@@ -1,14 +1,19 @@
 package com.gmail.ivamsantos.spotifystreamer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import kaaes.spotify.webapi.android.models.Artist;
+import kaaes.spotify.webapi.android.models.Track;
 
 
-public class ArtistTopTracksActivity extends ActionBarActivity {
+public class ArtistTopTracksActivity extends ActionBarActivity implements ArtistTopTracksFragment.OnTrackSelectedListener{
     public final static String LOG_TAG = ArtistTopTracksActivity.class.getSimpleName();
 
     @Override
@@ -22,8 +27,12 @@ public class ArtistTopTracksActivity extends ActionBarActivity {
     }
 
     private void setupTopTracksFragment() {
-        Artist artist = getIntent().getParcelableExtra(ArtistTopTracksFragment.ARGUMENT_KEY_ARTIST);
-        ArtistTopTracksFragment fragment = ArtistTopTracksFragment.withArtist(artist);
+        Artist artist = getIntent().getParcelableExtra(getString(R.string.extra_artist));
+        Bundle arguments = new Bundle();
+        arguments.putParcelable(getString(R.string.extra_artist), artist);
+
+        ArtistTopTracksFragment fragment = new ArtistTopTracksFragment();
+        fragment.setArguments(arguments);
 
         getSupportFragmentManager()
                 .beginTransaction()
@@ -50,5 +59,15 @@ public class ArtistTopTracksActivity extends ActionBarActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onTrackSelectedListener(Artist artist, List<Track> tracks, int position) {
+        Intent showTopTracksIntent = new Intent(this, TrackPlayerActivity.class);
+        showTopTracksIntent.putExtra(getString(R.string.extra_artist), artist);
+        showTopTracksIntent.putExtra(getString(R.string.extra_track_index), position);
+        showTopTracksIntent.putExtra(getString(R.string.extra_tracks), (ArrayList) tracks);
+
+        startActivity(showTopTracksIntent);
     }
 }

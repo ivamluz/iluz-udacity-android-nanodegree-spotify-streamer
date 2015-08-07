@@ -1,15 +1,18 @@
 package com.gmail.ivamsantos.spotifystreamer;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,10 +30,9 @@ import kaaes.spotify.webapi.android.models.Track;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class TrackPlayerFragment extends Fragment {
-    public static final String LOG_TAG = TrackPlayerFragment.class.getSimpleName();
+public class TrackPlayerDialogFragment extends DialogFragment {
+    public static final String LOG_TAG = TrackPlayerDialogFragment.class.getSimpleName();
     public static final int TRACK_INDEX_UNAVAILABLE = -1;
-    public static final String ARGUMENT_KEY_ARTIST = "artist";
 
     boolean isPlaying = false;
     private View mRootView;
@@ -46,7 +48,23 @@ public class TrackPlayerFragment extends Fragment {
 
     private MediaPlayer mMediaPlayer;
 
-    public TrackPlayerFragment() {
+    public TrackPlayerDialogFragment() {
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//        // Get the layout inflater
+//        LayoutInflater inflater = getActivity().getLayoutInflater();
+//
+//        // Inflate and set the layout for the dialog
+//        // Pass null as the parent view because its going in the dialog layout
+//        builder.setView(inflater.inflate(R.layout.fragment_track_player, null));
+//        return builder.create();
+
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        return dialog;
     }
 
     @Override
@@ -57,7 +75,7 @@ public class TrackPlayerFragment extends Fragment {
         mIsPaused = false;
         mCurrentPosition = 0;
 
-        loadValuesFromIntent();
+        loadArguments();
         setupActionBar();
         setLayoutComponentsValues();
         setupPlayerControlButtons();
@@ -65,13 +83,13 @@ public class TrackPlayerFragment extends Fragment {
         return mRootView;
     }
 
-    private void loadValuesFromIntent() {
-        Intent intent = getActivity().getIntent();
-        mArtist = intent.getParcelableExtra(ARGUMENT_KEY_ARTIST);
-        mTracks = intent.getParcelableArrayListExtra(getString(R.string.extra_tracks));
+    private void loadArguments() {
+        Bundle arguments = getArguments();
+        mArtist = arguments.getParcelable(getString(R.string.extra_artist));
+        mTracks = arguments.getParcelableArrayList(getString(R.string.extra_tracks));
 
         // FIXME: Handle invalid index
-        mCurrentTrackIndex = intent.getIntExtra(getString(R.string.extra_track_index), TRACK_INDEX_UNAVAILABLE);
+        mCurrentTrackIndex = arguments.getInt(getString(R.string.extra_track_index));
         mCurrentTrack = mTracks.get(mCurrentTrackIndex);
     }
 

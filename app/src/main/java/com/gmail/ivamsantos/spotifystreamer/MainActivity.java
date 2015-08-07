@@ -2,21 +2,29 @@ package com.gmail.ivamsantos.spotifystreamer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Artist;
+import kaaes.spotify.webapi.android.models.Track;
 
 
-public class MainActivity extends ActionBarActivity implements ArtistsFragment.OnArtistSelectedListener, ArtistsFragment.OnArtistsLoadedListener {
+public class MainActivity extends ActionBarActivity implements ArtistsFragment.OnArtistSelectedListener,
+        ArtistsFragment.OnArtistsLoadedListener, ArtistTopTracksFragment.OnTrackSelectedListener {
     public static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     boolean mIsDualPaneLayout;
+
+    {
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,14 +77,30 @@ public class MainActivity extends ActionBarActivity implements ArtistsFragment.O
 
     @Override
     public void onArtistsLoadedListener(List<Artist> artists) {
+        if (!mIsDualPaneLayout) {
+            return;
+        }
+
         if (artists != null && !artists.isEmpty()) {
             setupTopTracksFragment(artists.get(0));
         }
     }
 
+    @Override
+    public void onTrackSelectedListener(Artist artist, List<Track> tracks, int position) {
+        Bundle arguments = new Bundle();
+        arguments.putParcelable(getString(R.string.extra_artist), artist);
+        arguments.putInt(getString(R.string.extra_track_index), position);
+        arguments.putParcelableArrayList(getString(R.string.extra_tracks), (ArrayList) tracks);
+
+        DialogFragment dialog = new TrackPlayerDialogFragment();
+        dialog.setArguments(arguments);
+        dialog.show(getSupportFragmentManager(), TrackPlayerDialogFragment.class.getSimpleName());
+    }
+
     private void launchTopTracksActivity(Artist artist) {
         Intent showTopTracksIntent = new Intent(this, ArtistTopTracksActivity.class);
-        showTopTracksIntent.putExtra(ArtistTopTracksFragment.ARGUMENT_KEY_ARTIST, artist);
+        showTopTracksIntent.putExtra(getString(R.string.extra_artist), artist);
         startActivity(showTopTracksIntent);
     }
 
@@ -84,12 +108,16 @@ public class MainActivity extends ActionBarActivity implements ArtistsFragment.O
         ArtistTopTracksFragment topTracksFragment =
                 (ArtistTopTracksFragment) getSupportFragmentManager().findFragmentById(R.id.artist_top_tracks_container);
 
-        boolean topTracksFragmentDemandsInitialization = topTracksFragment == null
+        boolean topTracksFragmentDemandsSetup = topTracksFragment == null
                 || topTracksFragment.getArtist() == null
                 || topTracksFragment.getArtist().id != artist.id;
 
-        if (topTracksFragmentDemandsInitialization) {
-            topTracksFragment = ArtistTopTracksFragment.withArtist(artist);
+        if (topTracksFragmentDemandsSetup) {
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(getString(R.string.extra_artist), artist);
+
+            topTracksFragment = new ArtistTopTracksFragment();
+            topTracksFragment.setArguments(arguments);
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.artist_top_tracks_container, topTracksFragment, ArtistTopTracksFragment.TAG)
