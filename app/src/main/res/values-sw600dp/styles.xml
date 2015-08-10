@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TrackPlayer">
+        <item name="android:minWidth">500dp</item>
+    </style>
+</resources>
