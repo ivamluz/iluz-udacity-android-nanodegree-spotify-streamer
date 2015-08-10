@@ -230,6 +230,8 @@ public class ArtistsFragment extends Fragment {
         protected void onPostExecute(List<Artist> artists) {
             Log.d(LOG_TAG, "Entering onPostExecute().");
 
+            mOnArtistsLoadedListener.onArtistsLoadedListener(artists);
+
             hideProgressBar();
 
             if (artists == null) {
@@ -256,8 +258,6 @@ public class ArtistsFragment extends Fragment {
             if (!mArtistsAdapter.isEmpty()) {
                 artistsListView.smoothScrollToPosition(0);
             }
-
-            mOnArtistsLoadedListener.onArtistsLoadedListener(artists);
 
             showResultsList();
         }

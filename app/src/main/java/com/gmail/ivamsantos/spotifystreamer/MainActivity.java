@@ -66,7 +66,7 @@ public class MainActivity extends ActionBarActivity implements ArtistsFragment.O
             Log.i(LOG_TAG, "On dual panel layout. Setting " + ArtistTopTracksFragment.class.getSimpleName() + " fragment.");
             setupTopTracksFragment(artist);
         } else {
-            Log.i(LOG_TAG, "On single panel layout. Launching " + ArtistTopTracksActivity.class.getSimpleName() + ".");
+            Log.i(LOG_TAG, "On single panel layout. Launching " + ArtistTopTracksActivity.class.getSimpleName() + " activity.");
             launchTopTracksActivity(artist);
         }
     }
@@ -79,6 +79,8 @@ public class MainActivity extends ActionBarActivity implements ArtistsFragment.O
 
         if (artists != null && !artists.isEmpty()) {
             setupTopTracksFragment(artists.get(0));
+        } else {
+            setupTopTracksFragment(null);
         }
     }
 
@@ -106,6 +108,7 @@ public class MainActivity extends ActionBarActivity implements ArtistsFragment.O
 
         boolean topTracksFragmentDemandsSetup = topTracksFragment == null
                 || topTracksFragment.getArtist() == null
+                || artist == null
                 || topTracksFragment.getArtist().id != artist.id;
 
         if (topTracksFragmentDemandsSetup) {

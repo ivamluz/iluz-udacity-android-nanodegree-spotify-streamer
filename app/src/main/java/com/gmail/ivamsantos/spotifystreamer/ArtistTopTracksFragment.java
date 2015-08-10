@@ -85,13 +85,23 @@ public class ArtistTopTracksFragment extends Fragment {
 
             setupActionBar();
             setupTracksListView();
-            new LoadTopTracksTask().execute();
+
+            if (mArtist != null) {
+                new LoadTopTracksTask().execute();
+            } else {
+                hideTracksList();
+                showNoTracksMessage();
+            }
         }
 
         return mRootView;
     }
 
     private void setupActionBar() {
+        if (mArtist == null) {
+            return;
+        }
+
         // http://www.slideshare.net/cbeyls/android-32084115 (slide 13)
         ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
