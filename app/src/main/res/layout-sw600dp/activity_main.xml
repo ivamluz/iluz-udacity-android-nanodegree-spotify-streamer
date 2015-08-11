@@ -14,7 +14,13 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="2"
-        tools:layout="@android:layout/list_content" />
+        tools:layout="@android:layout/list_content"
+        />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="fill_parent"
+        android:background="@android:color/darker_gray"/>
 
     <FrameLayout
         android:id="@+id/artist_top_tracks_container"
