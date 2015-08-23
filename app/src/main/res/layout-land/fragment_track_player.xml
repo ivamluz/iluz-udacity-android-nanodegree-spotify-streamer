@@ -10,44 +10,61 @@
     style="@style/TrackPlayer"
     tools:context="com.gmail.ivamsantos.spotifystreamer.TrackPlayerDialogFragment">
 
-    <TextView
-        android:id="@+id/trackPlayerArtistName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0"
-        android:paddingBottom="12dp"
-        android:text="Artist name"
-        android:textSize="20dp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/trackPlayerAlbumName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0"
-        android:paddingBottom="12dp"
-        android:text="Album name" />
-
-    <ImageView
-        android:id="@+id/trackPlayerAlbumImage"
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
-        android:paddingBottom="16dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/art_cover_placeholder" />
-
-    <TextView
-        android:id="@+id/trackPlayerTrackName"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0"
-        android:paddingBottom="12dp"
-        android:text="Music name" />
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/trackPlayerArtistName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0"
+                android:paddingBottom="12dp"
+                android:text="Artist name"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/trackPlayerAlbumName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0"
+                android:paddingBottom="12dp"
+                android:text="Album name" />
+
+
+            <TextView
+                android:id="@+id/trackPlayerTrackName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0"
+                android:paddingBottom="12dp"
+                android:text="Music name" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/trackPlayerAlbumImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:paddingBottom="16dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/art_cover_placeholder" />
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="fill_parent"

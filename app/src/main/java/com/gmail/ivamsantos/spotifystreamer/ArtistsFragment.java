@@ -38,7 +38,10 @@ public class ArtistsFragment extends Fragment {
     public static final String LOG_TAG = ArtistsFragment.class.getSimpleName();
     private static final int SEARCH_LIMIT = 50;
     private static final String INITIAL_SEARCH_TERM = "a";
+    public static final String BUNDLE_KEY_ARTISTS = "artists";
+    public static final String BUNDLE_KEY_SEARCH_TERM = "search-term";
 
+    private ArrayList<Artist> mArtists;
     private ArrayAdapter<Artist> mArtistsAdapter;
     private View mRootView;
     private SpotifyService mSpotify;
@@ -56,10 +59,6 @@ public class ArtistsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        // http://stackoverflow.com/a/28667895
-        ArrayList<Artist> artists = new ArrayList<>();
-        mArtistsAdapter = new ArtistAdapter(getActivity().getApplicationContext(), artists);
-
         initSpotifyService();
     }
 
@@ -68,10 +67,18 @@ public class ArtistsFragment extends Fragment {
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_artists, container, false);
 
-        setupArtistsSearchBox();
+        String searchTerm = "";
+        mArtists = new ArrayList<>();
+        if (savedInstanceState != null) {
+            searchTerm = savedInstanceState.getString(BUNDLE_KEY_SEARCH_TERM);
+            mArtists = savedInstanceState.getParcelableArrayList(BUNDLE_KEY_ARTISTS);
+        }
+        mArtistsAdapter = new ArtistAdapter(getActivity().getApplicationContext(), mArtists);
+
+        setupArtistsSearchBox(searchTerm);
         setupArtistsListView();
 
-        if (!mIsResultsListDirty) {
+        if (mArtists.isEmpty()) {
             loadInitialArtists();
         }
 
@@ -87,8 +94,10 @@ public class ArtistsFragment extends Fragment {
         mSpotify = api.getService();
     }
 
-    private void setupArtistsSearchBox() {
-        searchBox().setOnEditorActionListener(new TextView.OnEditorActionListener() {
+    private void setupArtistsSearchBox(String searchTerm) {
+        TextView searchBox = searchBox();
+        searchBox.setText(searchTerm);
+        searchBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView field, int actionId, KeyEvent event) {
                 boolean handled = false;
@@ -172,6 +181,13 @@ public class ArtistsFragment extends Fragment {
 
     private void setProgressBarVisibility(int visibility) {
         mRootView.findViewById(R.id.searchProgressBar).setVisibility(visibility);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
+        bundle.putParcelableArrayList(BUNDLE_KEY_ARTISTS, mArtists);
+        bundle.putString(BUNDLE_KEY_SEARCH_TERM, searchBox().getText().toString());
     }
 
     @Override
