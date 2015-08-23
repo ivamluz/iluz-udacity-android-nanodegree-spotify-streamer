@@ -17,6 +17,7 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.gmail.ivamsantos.spotifystreamer.MainActivity;
+import com.gmail.ivamsantos.spotifystreamer.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -204,11 +205,12 @@ public class MediaPlayerService extends Service implements
         return false;
     }
 
-    // TODO i18n
     @Override
     public void onPrepared(MediaPlayer mp) {
         configAndStartMediaPlayer();
-        updateNotification(getCurrentTrack().name + " (playing)");
+
+        String text = String.format(getResources().getString(R.string.notification_playing), getCurrentTrack().name);
+        updateNotification(text);
     }
 
     private void configAndStartMediaPlayer() {
@@ -299,16 +301,12 @@ public class MediaPlayerService extends Service implements
         tryToGetAudioFocus();
         setServiceState(ServiceState.PREPARING);
         mMediaPlayer.prepareAsync();
-        // TODO: i18n
-        showNotification(currentTrack.name + " (loading)");
-        mWifiLock.acquire();
-    }
 
-    public void stop() {
-        mState = ServiceState.STOPPED;
-        releaseResources(true);
-        giveUpAudioFocus();
-        stopSelf();
+        String text = String.format(getResources().getString(R.string.notification_loading), getCurrentTrack().name);
+        updateNotification(text);
+
+        showNotification(text);
+        mWifiLock.acquire();
     }
 
     public void continuePlaying() {
@@ -321,14 +319,19 @@ public class MediaPlayerService extends Service implements
         mMediaPlayer.start();
         activateProgressReporter();
         setServiceState(ServiceState.PLAYING);
+
+        String text = String.format(getResources().getString(R.string.notification_playing), getCurrentTrack().name);
+        updateNotification(text);
     }
 
     private void pause() {
         if (ServiceState.PLAYING.equals(mState)) {
             setServiceState(ServiceState.PAUSED);
             deactivateProgressReporter();
-            // TODO: i18n
-            updateNotification(getCurrentTrack().name + " (paused)");
+
+            String text = String.format(getResources().getString(R.string.notification_paused), getCurrentTrack().name);
+            updateNotification(text);
+
             if (mMediaPlayer.isPlaying()) {
                 mMediaPlayer.pause();
             }
