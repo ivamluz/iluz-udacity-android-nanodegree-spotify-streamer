@@ -249,10 +249,10 @@ public class TrackPlayerDialogFragment extends DialogFragment implements SeekBar
     }
 
     private void bindValues() {
-        TextView artistNameTextView = (TextView) mRootView.findViewById(R.id.trackPlayerArtistName);
-        TextView albumNameTextView = (TextView) mRootView.findViewById(R.id.trackPlayerAlbumName);
-        TextView trackNameTextView = (TextView) mRootView.findViewById(R.id.trackPlayerTrackName);
-        ImageView albumImageImageView = (ImageView) mRootView.findViewById(R.id.trackPlayerAlbumImage);
+        TextView artistNameTextView = (TextView) mRootView.findViewById(R.id.track_player_artist_name);
+        TextView albumNameTextView = (TextView) mRootView.findViewById(R.id.track_player_album_name);
+        TextView trackNameTextView = (TextView) mRootView.findViewById(R.id.track_player_track_name);
+        ImageView albumImageImageView = (ImageView) mRootView.findViewById(R.id.track_player_album_image);
 
         Track currentTrack = currentTrack();
         artistNameTextView.setText(mArtist.name);

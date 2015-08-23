@@ -34,8 +34,8 @@ public class ArtistAdapter extends ArrayAdapter<Artist> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_artist, parent, false);
         }
 
-        ImageView artistImage = (ImageView) convertView.findViewById(R.id.artistImage);
-        TextView artistName = (TextView) convertView.findViewById(R.id.artistName);
+        ImageView artistImage = (ImageView) convertView.findViewById(R.id.artist_image);
+        TextView artistName = (TextView) convertView.findViewById(R.id.artist_name);
 
         String imageUrl = SpotifyImageHelper.getPreferredImageUrl(artist.images);
         Picasso.with(getContext())

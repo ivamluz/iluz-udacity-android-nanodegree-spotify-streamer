@@ -23,7 +23,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/trackPlayerArtistName"
+                android:id="@+id/track_player_artist_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -34,7 +34,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/trackPlayerAlbumName"
+                android:id="@+id/track_player_album_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -44,7 +44,7 @@
 
 
             <TextView
-                android:id="@+id/trackPlayerTrackName"
+                android:id="@+id/track_player_track_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -55,7 +55,7 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/trackPlayerAlbumImage"
+            android:id="@+id/track_player_album_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -88,7 +88,7 @@
 
 
         <TextView
-            android:id="@+id/trackPlayerDuration"
+            android:id="@+id/track_player_duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"

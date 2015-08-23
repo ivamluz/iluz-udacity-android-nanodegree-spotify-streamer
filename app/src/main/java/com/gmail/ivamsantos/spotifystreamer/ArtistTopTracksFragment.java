@@ -111,7 +111,7 @@ public class ArtistTopTracksFragment extends Fragment {
     }
 
     private void setupTracksListView() {
-        ListView listView = (ListView) mRootView.findViewById(R.id.listViewTopTracks);
+        ListView listView = (ListView) mRootView.findViewById(R.id.list_top_tracks);
         listView.setAdapter(mTracksAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -142,7 +142,7 @@ public class ArtistTopTracksFragment extends Fragment {
     }
 
     private void setTracksListVisibility(int visibility) {
-        mRootView.findViewById(R.id.listViewTopTracks).setVisibility(visibility);
+        mRootView.findViewById(R.id.list_top_tracks).setVisibility(visibility);
     }
 
     private void showNoTracksMessage() {
@@ -154,7 +154,7 @@ public class ArtistTopTracksFragment extends Fragment {
     }
 
     private void setNoTracksMessageVisibility(int visibility) {
-        mRootView.findViewById(R.id.noTracksMessage).setVisibility(visibility);
+        mRootView.findViewById(R.id.no_tracks_message).setVisibility(visibility);
     }
 
     private void showProgressBar() {
@@ -166,7 +166,7 @@ public class ArtistTopTracksFragment extends Fragment {
     }
 
     private void setProgressBarVisibility(int visibility) {
-        mRootView.findViewById(R.id.loadTracksProgressBar).setVisibility(visibility);
+        mRootView.findViewById(R.id.load_tracks_progress_bar).setVisibility(visibility);
     }
 
     private String getCountry() {

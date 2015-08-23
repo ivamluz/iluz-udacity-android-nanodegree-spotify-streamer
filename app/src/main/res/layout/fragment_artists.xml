@@ -12,7 +12,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/searchBox"
+        android:id="@+id/search_box"
         android:hint="@string/search_box_hint"
         android:imeOptions="actionSearch"
         android:inputType="text"
@@ -24,7 +24,7 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/listViewArtists"
+        android:id="@+id/list_artists"
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
         android:visibility="visible" />
@@ -36,7 +36,7 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:visibility="gone"
-        android:id="@+id/searchProgressBar" />
+        android:id="@+id/search_progress_bar" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -47,6 +47,6 @@
         android:gravity="center"
         android:layout_weight="1"
         android:visibility="gone"
-        android:id="@+id/noResultsMessage" />
+        android:id="@+id/no_artists_message" />
 
 </LinearLayout>

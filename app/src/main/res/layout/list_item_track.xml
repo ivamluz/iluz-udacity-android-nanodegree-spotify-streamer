@@ -6,7 +6,7 @@
     android:paddingRight="16dp">
 
     <ImageView
-        android:id="@+id/albumImage"
+        android:id="@+id/album_image"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
@@ -23,7 +23,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/trackName"
+            android:id="@+id/track_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -33,7 +33,7 @@
             android:textColor="#606060" />
 
         <TextView
-            android:id="@+id/albumName"
+            android:id="@+id/album_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"

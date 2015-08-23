@@ -114,7 +114,7 @@ public class ArtistsFragment extends Fragment {
     }
 
     private TextView searchBox() {
-        return (TextView) mRootView.findViewById(R.id.searchBox);
+        return (TextView) mRootView.findViewById(R.id.search_box);
     }
 
     private void hideSoftKeyboard(IBinder windowToken) {
@@ -155,7 +155,7 @@ public class ArtistsFragment extends Fragment {
     }
 
     private ListView artistsList() {
-        return (ListView) mRootView.findViewById(R.id.listViewArtists);
+        return (ListView) mRootView.findViewById(R.id.list_artists);
     }
 
     private void showNoResultsMessage() {
@@ -167,7 +167,7 @@ public class ArtistsFragment extends Fragment {
     }
 
     private void setNoResultsMessageVisibility(int visibility) {
-        mRootView.findViewById(R.id.noResultsMessage).setVisibility(visibility);
+        mRootView.findViewById(R.id.no_artists_message).setVisibility(visibility);
     }
 
     private void showProgressBar() {
@@ -179,7 +179,7 @@ public class ArtistsFragment extends Fragment {
     }
 
     private void setProgressBarVisibility(int visibility) {
-        mRootView.findViewById(R.id.searchProgressBar).setVisibility(visibility);
+        mRootView.findViewById(R.id.search_progress_bar).setVisibility(visibility);
     }
 
     @Override

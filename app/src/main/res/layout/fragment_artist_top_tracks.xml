@@ -11,7 +11,7 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/listViewTopTracks"
+        android:id="@+id/list_top_tracks"
         android:layout_gravity="center_vertical"
         android:visibility="gone"
         android:layout_weight="1" />
@@ -24,7 +24,7 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:visibility="gone"
-        android:id="@+id/loadTracksProgressBar" />
+        android:id="@+id/load_tracks_progress_bar" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -35,6 +35,6 @@
         android:gravity="center"
         android:layout_weight="1"
         android:visibility="gone"
-        android:id="@+id/noTracksMessage" />
+        android:id="@+id/no_tracks_message" />
 
 </LinearLayout>

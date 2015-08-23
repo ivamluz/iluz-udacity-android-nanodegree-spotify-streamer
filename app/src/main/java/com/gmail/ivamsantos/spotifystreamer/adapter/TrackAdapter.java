@@ -34,9 +34,9 @@ public class TrackAdapter extends ArrayAdapter<Track> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_track, parent, false);
         }
 
-        ImageView albumImage = (ImageView) convertView.findViewById(R.id.albumImage);
-        TextView trackName = (TextView) convertView.findViewById(R.id.trackName);
-        TextView albumName = (TextView) convertView.findViewById(R.id.albumName);
+        ImageView albumImage = (ImageView) convertView.findViewById(R.id.album_image);
+        TextView trackName = (TextView) convertView.findViewById(R.id.track_name);
+        TextView albumName = (TextView) convertView.findViewById(R.id.album_name);
 
         String imageUrl = SpotifyImageHelper.getPreferredImageUrl(track.album.images);
         Picasso.with(getContext())
