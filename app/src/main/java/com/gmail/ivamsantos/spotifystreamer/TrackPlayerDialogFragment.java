@@ -38,7 +38,7 @@ import kaaes.spotify.webapi.android.models.Track;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class TrackPlayerDialogFragment extends DialogFragment {
+public class TrackPlayerDialogFragment extends DialogFragment implements SeekBar.OnSeekBarChangeListener {
     public static final String LOG_TAG = TrackPlayerDialogFragment.class.getSimpleName();
     public static final String BUNDLE_KEY_ARTIST = "artist";
     public static final String BUNDLE_KEY_TRACKS = "tracks";
@@ -168,6 +168,7 @@ public class TrackPlayerDialogFragment extends DialogFragment {
         mSeekBar = seekBar();
         mSeekBar.setProgress(0);
         mSeekBar.setMax(30);
+        mSeekBar.setOnSeekBarChangeListener(this);
     }
 
     private ImageButton nextButton() {
@@ -186,20 +187,15 @@ public class TrackPlayerDialogFragment extends DialogFragment {
         playPauseButton().setEnabled(true);
         nextButton().setEnabled(true);
         previousButton().setEnabled(true);
+        seekBar().setEnabled(true);
     }
 
     private void disablePlayerControls() {
         playPauseButton().setEnabled(false);
         nextButton().setEnabled(false);
         previousButton().setEnabled(false);
+        seekBar().setEnabled(false);
     }
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//
-//        setupBroadcastReceivers();
-//    }
 
     private void setupBroadcastReceivers() {
         LocalBroadcastManager.getInstance(mParentActivity).registerReceiver(getOnCurrentTrackChangedReceiver(),
@@ -363,5 +359,33 @@ public class TrackPlayerDialogFragment extends DialogFragment {
         };
 
         return mOnTrackProgressUpdatedReceiver;
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (fromUser) {
+            // should be in milliseconds.
+            int position = progress * 1000;
+            mMediaPlayerService.seekTo(position);
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+        // not interested in this event.
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        // not interested in this event.
+    }
+
+    // http://stackoverflow.com/a/12434038
+    @Override
+    public void onDestroyView() {
+        if (getDialog() != null && getRetainInstance()) {
+            getDialog().setDismissMessage(null);
+        }
+        super.onDestroyView();
     }
 }

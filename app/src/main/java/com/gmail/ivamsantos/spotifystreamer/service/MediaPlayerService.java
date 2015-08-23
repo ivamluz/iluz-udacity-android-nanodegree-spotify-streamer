@@ -15,6 +15,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.gmail.ivamsantos.spotifystreamer.MainActivity;
@@ -45,7 +46,7 @@ public class MediaPlayerService extends Service implements
     private static final String LOG_TAG = MediaPlayerService.class.getSimpleName();
     private static final float LOUD_VOLUME = 1.0f;
     private static final float DUCK_VOLUME = 0.1f;
-
+    private static final int NOTIFICATION_ID = 1;
     private final IBinder selfBinder = new MediaPlayerServiceBinder();
     private MediaPlayer mMediaPlayer;
     private ArrayList<Track> mTracks;
@@ -54,14 +55,9 @@ public class MediaPlayerService extends Service implements
     private AudioManager mAudioManager;
     private AudioFocus mAudioFocus = AudioFocus.NO_FOCUS_NO_DUCK;
     private ServiceState mState = ServiceState.STOPPED;
-
     private ScheduledExecutorService mScheduleTaskExecutor;
     private ScheduledFuture<?> mTrackProgressReporter;
-
-
-    private static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
-    private Notification mNotification = null;
     private Artist mArtist;
 
     @Override
@@ -132,6 +128,16 @@ public class MediaPlayerService extends Service implements
         startPlay();
     }
 
+    /**
+     * Seek to specific position of the track.
+     * @param position milliseconds
+     */
+    public void seekTo(int position) {
+        if (ServiceState.PLAYING.equals(mState) || ServiceState.PAUSED.equals(mState)) {
+            mMediaPlayer.seekTo(position);
+        }
+    }
+
     public int getCurrentTrackIndex() {
         return mCurrentTrackIndex;
     }
@@ -157,7 +163,7 @@ public class MediaPlayerService extends Service implements
                 intent.putExtra(BROADCAST_DATA_CURRENT_PROGRESS, mMediaPlayer.getCurrentPosition());
                 LocalBroadcastManager.getInstance(MediaPlayerService.this).sendBroadcast(intent);
             }
-        }, 0, 300, TimeUnit.MILLISECONDS);
+        }, 500, 350, TimeUnit.MILLISECONDS);
     }
 
     private void deactivateProgressReporter() {
@@ -239,12 +245,12 @@ public class MediaPlayerService extends Service implements
         mArtist = artist;
     }
 
-    public void setTracksList(ArrayList<Track> tracks) {
-        mTracks = tracks;
-    }
-
     public ArrayList<Track> getTracksList() {
         return mTracks;
+    }
+
+    public void setTracksList(ArrayList<Track> tracks) {
+        mTracks = tracks;
     }
 
     public void selectTrack(int trackIndex) {
@@ -276,20 +282,17 @@ public class MediaPlayerService extends Service implements
             return;
         }
 
-        if (mMediaPlayer.isPlaying()) {
-            return;
-        }
-
         tryToGetAudioFocus();
         mWifiLock.acquire();
-        activateProgressReporter();
         mMediaPlayer.start();
+        activateProgressReporter();
         setServiceState(ServiceState.PLAYING);
     }
 
     private void pause() {
         if (ServiceState.PLAYING.equals(mState)) {
             setServiceState(ServiceState.PAUSED);
+            deactivateProgressReporter();
             // TODO: i18n
             updateNotification(getCurrentTrack().name + " (paused)");
             if (mMediaPlayer.isPlaying()) {
@@ -386,40 +389,35 @@ public class MediaPlayerService extends Service implements
         return AudioManager.AUDIOFOCUS_REQUEST_GRANTED == mAudioManager.abandonAudioFocus(this);
     }
 
-    // TODO: Use builder
     private void updateNotification(String text) {
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
                 new Intent(getApplicationContext(), MainActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        mNotification.setLatestEventInfo(getApplicationContext(), mArtist.name, text, pi);
-        mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+
+        Notification notification = buildNotification(text, pi);
+        mNotificationManager.notify(NOTIFICATION_ID, notification);
     }
 
-    // TODO: Use builder
     private void showNotification(String text) {
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
                 new Intent(getApplicationContext(), MainActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        mNotification = new Notification();
-        mNotification.tickerText = text;
-        mNotification.icon = android.R.drawable.ic_media_play;
-        mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
 
-        mNotification.setLatestEventInfo(getApplicationContext(), mArtist.name,
-                text, pi);
-        startForeground(NOTIFICATION_ID, mNotification);
+        Notification notification = buildNotification(text, pi);
+        startForeground(NOTIFICATION_ID, notification);
     }
 
-    public Bitmap getArtistIcon() {
-        Bitmap artistIcon = null;
-        try {
-            String imageUrl = SpotifyImageHelper.getPreferredImageUrl(mArtist.images);
-            artistIcon = BitmapFactory.decodeStream((InputStream) new URL(imageUrl).getContent());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private Notification buildNotification(String text, PendingIntent pi) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder
+                .setContentIntent(pi)
+                .setTicker(text)
+                .setContentText(text)
+                .setSmallIcon(android.R.drawable.ic_media_play)
+                .setOngoing(true)
+                .setContentTitle(mArtist.name);
 
-        return artistIcon;
+        return builder.build();
     }
 
     private enum AudioFocus {
