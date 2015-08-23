@@ -122,7 +122,6 @@ public class TrackPlayerDialogFragment extends DialogFragment implements SeekBar
             loadArguments();
         } else {
             loadSavedInstanceState(savedInstanceState);
-//            mCurrentTrackIndex = mMediaPlayerService.getCurrentTrackIndex();
         }
 
         setupMediaPlayerService();
@@ -275,9 +274,6 @@ public class TrackPlayerDialogFragment extends DialogFragment implements SeekBar
     }
 
     private String getAlbumImage(Track track) {
-
-        Log.i(LOG_TAG, "ORIENTATION: " + getResources().getConfiguration().orientation);
-
         String imageUrl = null;
         if (!track.album.images.isEmpty()) {
             imageUrl = track.album.images.get(0).url;

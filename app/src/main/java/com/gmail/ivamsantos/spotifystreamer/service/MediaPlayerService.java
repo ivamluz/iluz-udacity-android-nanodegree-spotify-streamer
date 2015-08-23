@@ -6,8 +6,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
@@ -19,11 +17,8 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.gmail.ivamsantos.spotifystreamer.MainActivity;
-import com.gmail.ivamsantos.spotifystreamer.helper.SpotifyImageHelper;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -43,6 +38,13 @@ public class MediaPlayerService extends Service implements
     public static final String BROADCAST_DATA_CURRENT_TRACK = "current-track";
     public static final String BROADCAST_DATA_CURRENT_STATE = "current-state";
     public static final String BROADCAST_DATA_CURRENT_PROGRESS = "current-progress";
+
+
+    public static final String ACTION_TOGGLE_PLAYBACK = "com.gmail.ivamsantos.spotifystreamer.action.TOGGLE_PLAYBACK";
+    public static final String ACTION_FOWARD = "com.gmail.ivamsantos.spotifystreamer.action.FOWARD";
+    public static final String ACTION_PREVIOUS = "com.gmail.ivamsantos.spotifystreamer.action.PREVIOUS";
+
+
     private static final String LOG_TAG = MediaPlayerService.class.getSimpleName();
     private static final float LOUD_VOLUME = 1.0f;
     private static final float DUCK_VOLUME = 0.1f;
@@ -82,7 +84,8 @@ public class MediaPlayerService extends Service implements
 
     @Override
     public void onDestroy() {
-        releaseWifiLock();
+        releaseResources(true);
+        super.onDestroy();
     }
 
     @Override
@@ -92,11 +95,34 @@ public class MediaPlayerService extends Service implements
 
     @Override
     public boolean onUnbind(Intent intent) {
-        deactivateProgressReporter();
-        mMediaPlayer.stop();
-        mMediaPlayer.release();
+        super.onUnbind(intent);
+        releaseResources(true);
 
         return false;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        String action = intent.getAction();
+        if (action == null) {
+            return START_NOT_STICKY;
+        }
+
+        switch (action) {
+            case ACTION_TOGGLE_PLAYBACK:
+                togglePlayback();
+                break;
+            case ACTION_FOWARD:
+                foward();
+                break;
+            case ACTION_PREVIOUS:
+                previous();
+                break;
+            default:
+                Log.w(LOG_TAG, String.format("Intent action %s doesn't match any known action.", action));
+        }
+
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -130,6 +156,7 @@ public class MediaPlayerService extends Service implements
 
     /**
      * Seek to specific position of the track.
+     *
      * @param position milliseconds
      */
     public void seekTo(int position) {
@@ -277,6 +304,13 @@ public class MediaPlayerService extends Service implements
         mWifiLock.acquire();
     }
 
+    public void stop() {
+        mState = ServiceState.STOPPED;
+        releaseResources(true);
+        giveUpAudioFocus();
+        stopSelf();
+    }
+
     public void continuePlaying() {
         if (!ServiceState.PAUSED.equals(mState)) {
             return;
@@ -298,7 +332,7 @@ public class MediaPlayerService extends Service implements
             if (mMediaPlayer.isPlaying()) {
                 mMediaPlayer.pause();
             }
-            releaseResources(false);
+            releaseWifiLock();
         }
     }
 
@@ -308,6 +342,7 @@ public class MediaPlayerService extends Service implements
             releaseMediaPlayer();
         }
         releaseWifiLock();
+        deactivateProgressReporter();
     }
 
     private void releaseMediaPlayer() {
@@ -390,24 +425,37 @@ public class MediaPlayerService extends Service implements
     }
 
     private void updateNotification(String text) {
-        PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
-                new Intent(getApplicationContext(), MainActivity.class),
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Notification notification = buildNotification(text, pi);
+        Notification notification = buildNotification(text);
         mNotificationManager.notify(NOTIFICATION_ID, notification);
     }
 
     private void showNotification(String text) {
+        Notification notification = buildNotification(text);
+        startForeground(NOTIFICATION_ID, notification);
+    }
+
+    private Notification buildNotification(String text) {
+        PendingIntent previousIntent = PendingIntent.getService(this, 0,
+                new Intent(MediaPlayerService.ACTION_PREVIOUS),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        PendingIntent togglePlaybackIntent = PendingIntent.getService(this, 0,
+                new Intent(MediaPlayerService.ACTION_TOGGLE_PLAYBACK),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        PendingIntent fowardIntent = PendingIntent.getService(this, 0,
+                new Intent(MediaPlayerService.ACTION_FOWARD),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
                 new Intent(getApplicationContext(), MainActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification notification = buildNotification(text, pi);
-        startForeground(NOTIFICATION_ID, notification);
-    }
+        int togglePlaybackIcon = android.R.drawable.ic_media_play;
+        if (ServiceState.PLAYING.equals(mState)) {
+            togglePlaybackIcon = android.R.drawable.ic_media_pause;
+        }
 
-    private Notification buildNotification(String text, PendingIntent pi) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder
                 .setContentIntent(pi)
@@ -415,7 +463,10 @@ public class MediaPlayerService extends Service implements
                 .setContentText(text)
                 .setSmallIcon(android.R.drawable.ic_media_play)
                 .setOngoing(true)
-                .setContentTitle(mArtist.name);
+                .setContentTitle(mArtist.name)
+                .addAction(android.R.drawable.ic_media_previous, null, previousIntent)
+                .addAction(togglePlaybackIcon, null, togglePlaybackIntent)
+                .addAction(android.R.drawable.ic_media_next, null, fowardIntent);
 
         return builder.build();
     }
