@@ -3,6 +3,7 @@ package com.gmail.ivamsantos.spotifystreamer;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -19,8 +20,11 @@ import kaaes.spotify.webapi.android.models.Track;
 public class MainActivity extends ActionBarActivity implements ArtistsFragment.OnArtistSelectedListener,
         ArtistsFragment.OnArtistsLoadedListener, ArtistTopTracksFragment.OnTrackSelectedListener {
     public static final String LOG_TAG = MainActivity.class.getSimpleName();
+    public static final String BUNDLE_KEY_PLAYER_DIALOG = "player-dialog";
 
     boolean mIsDualPaneLayout;
+
+    DialogFragment mPlayerDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,10 +67,10 @@ public class MainActivity extends ActionBarActivity implements ArtistsFragment.O
         Log.i(LOG_TAG, "onArtistSelectedListener triggered.");
 
         if (mIsDualPaneLayout) {
-            Log.i(LOG_TAG, "On dual panel layout. Setting " + ArtistTopTracksFragment.class.getSimpleName() + " fragment.");
+            Log.d(LOG_TAG, "On dual panel layout. Setting " + ArtistTopTracksFragment.class.getSimpleName() + " fragment.");
             setupTopTracksFragment(artist);
         } else {
-            Log.i(LOG_TAG, "On single panel layout. Launching " + ArtistTopTracksActivity.class.getSimpleName() + " activity.");
+            Log.d(LOG_TAG, "On single panel layout. Launching " + ArtistTopTracksActivity.class.getSimpleName() + " activity.");
             launchTopTracksActivity(artist);
         }
     }
@@ -91,9 +95,9 @@ public class MainActivity extends ActionBarActivity implements ArtistsFragment.O
         arguments.putInt(getString(R.string.extra_track_index), position);
         arguments.putParcelableArrayList(getString(R.string.extra_tracks), (ArrayList) tracks);
 
-        DialogFragment dialog = new TrackPlayerDialogFragment();
-        dialog.setArguments(arguments);
-        dialog.show(getSupportFragmentManager(), TrackPlayerDialogFragment.class.getSimpleName());
+        mPlayerDialog = new TrackPlayerDialogFragment();
+        mPlayerDialog.setArguments(arguments);
+        mPlayerDialog.show(getSupportFragmentManager(), TrackPlayerDialogFragment.class.getSimpleName());
     }
 
     private void launchTopTracksActivity(Artist artist) {
@@ -123,5 +127,21 @@ public class MainActivity extends ActionBarActivity implements ArtistsFragment.O
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .commit();
         }
+    }
+
+    // http://stackoverflow.com/q/14657490
+    @Override
+    public void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
+        if (mPlayerDialog != null && mPlayerDialog.isAdded()) {
+            getSupportFragmentManager().putFragment(bundle, BUNDLE_KEY_PLAYER_DIALOG, mPlayerDialog);
+        }
+    }
+
+    // http://stackoverflow.com/q/14657490
+    @Override
+    public void onRestoreInstanceState(Bundle bundle) {
+        FragmentManager fm = getSupportFragmentManager();
+        mPlayerDialog = (TrackPlayerDialogFragment) fm.getFragment(bundle, BUNDLE_KEY_PLAYER_DIALOG);
     }
 }

@@ -46,7 +46,6 @@ public class ArtistsFragment extends Fragment {
     private View mRootView;
     private SpotifyService mSpotify;
 
-    private boolean mIsResultsListDirty = false;
     private OnArtistSelectedListener mOnArtistSelectedListener;
     private OnArtistsLoadedListener mOnArtistsLoadedListener;
 
@@ -214,7 +213,6 @@ public class ArtistsFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            mIsResultsListDirty = true;
             setUiSearchingState();
             Log.d(LOG_TAG, "Entering onPreExecute().");
         }
