@@ -56,6 +56,7 @@
         android:orientation="horizontal">
 
         <TextView
+            android:id="@+id/track_player_current_progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0"

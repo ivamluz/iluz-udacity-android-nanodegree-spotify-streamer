@@ -29,6 +29,8 @@ import com.gmail.ivamsantos.spotifystreamer.service.MediaPlayerService.MediaPlay
 import com.gmail.ivamsantos.spotifystreamer.service.MediaPlayerService.ServiceState;
 import com.squareup.picasso.Picasso;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 import kaaes.spotify.webapi.android.models.Artist;
@@ -44,6 +46,7 @@ public class TrackPlayerDialogFragment extends DialogFragment implements SeekBar
     public static final String BUNDLE_KEY_TRACKS = "tracks";
     public static final String BUNDLE_KEY_IS_MEDIA_PLAYER_SERVICE_BOUND = "is-media-player-service-bound";
     public static final String BUNDLE_KEY_CURRENT_TRACK_INDEX = "current-track-index";
+    public static final int MAX_TRACk_LENGTH_IN_SECONDS = 30;
     private MediaPlayerServiceBinder mMediaPlayerServiceBinder;
     private View mRootView;
     private ActionBar mActionBar;
@@ -345,8 +348,12 @@ public class TrackPlayerDialogFragment extends DialogFragment implements SeekBar
                 try {
                     int progress = intent.getIntExtra(MediaPlayerService.BROADCAST_DATA_CURRENT_PROGRESS, 0);
                     progress = (int) Math.ceil((double) progress / 1000);
+                    if (progress > MAX_TRACk_LENGTH_IN_SECONDS) {
+                        progress = MAX_TRACk_LENGTH_IN_SECONDS;
+                    }
 
                     Log.v(LOG_TAG, String.format("Current progress: %s", progress));
+                    textviewCurrentProgress().setText(String.format("0:%02d", progress));
                     seekBar().setProgress(progress);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -355,6 +362,10 @@ public class TrackPlayerDialogFragment extends DialogFragment implements SeekBar
         };
 
         return mOnTrackProgressUpdatedReceiver;
+    }
+
+    private TextView textviewCurrentProgress() {
+        return (TextView) mRootView.findViewById(R.id.track_player_current_progress);
     }
 
     @Override
