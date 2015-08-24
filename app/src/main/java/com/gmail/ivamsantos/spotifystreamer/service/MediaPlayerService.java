@@ -65,6 +65,8 @@ public class MediaPlayerService extends Service implements
     private NotificationManager mNotificationManager;
     private Artist mArtist;
 
+    boolean mHasError = false;
+
     private SharedPreferences mPreferences;
 
     @Override
@@ -134,7 +136,14 @@ public class MediaPlayerService extends Service implements
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        foward();
+        // Workaround for handling errors on prepareAsync.
+        if (mHasError) {
+            startPlay();
+        } else {
+            foward();
+        }
+
+        mHasError = false;
     }
 
     public void foward() {
@@ -208,6 +217,8 @@ public class MediaPlayerService extends Service implements
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
+        mHasError = true;
+        Log.e(LOG_TAG, String.format("MediaPlayer error: [what: %s, extra: %s]", what, extra));
         return false;
     }
 
@@ -494,6 +505,7 @@ public class MediaPlayerService extends Service implements
                 .setSmallIcon(android.R.drawable.ic_media_play)
                 .setOngoing(true)
                 .setContentTitle(mArtist.name)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .addAction(android.R.drawable.ic_media_previous, null, previousIntent)
                 .addAction(togglePlaybackIcon, null, togglePlaybackIntent)
                 .addAction(android.R.drawable.ic_media_next, null, fowardIntent);
