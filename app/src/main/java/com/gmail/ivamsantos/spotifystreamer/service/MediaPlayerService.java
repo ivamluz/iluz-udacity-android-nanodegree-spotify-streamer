@@ -6,12 +6,14 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
@@ -63,6 +65,8 @@ public class MediaPlayerService extends Service implements
     private NotificationManager mNotificationManager;
     private Artist mArtist;
 
+    private SharedPreferences mPreferences;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -72,6 +76,8 @@ public class MediaPlayerService extends Service implements
 
         mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     private void setupMediaPlayer() {
@@ -428,13 +434,34 @@ public class MediaPlayerService extends Service implements
     }
 
     private void updateNotification(String text) {
+        if (!areNotificationsEnabled()) {
+            stopForeground(true);
+            mNotificationManager.cancel(NOTIFICATION_ID);
+            return;
+        }
+
         Notification notification = buildNotification(text);
         mNotificationManager.notify(NOTIFICATION_ID, notification);
     }
 
     private void showNotification(String text) {
+        if (!areNotificationsEnabled()) {
+            stopForeground(true);
+            return;
+        }
+
         Notification notification = buildNotification(text);
         startForeground(NOTIFICATION_ID, notification);
+    }
+
+    private boolean areNotificationsEnabled() {
+        String preferenceKey = getString(R.string.pref_key_enable_notifications);
+        boolean defaultValue = Boolean.valueOf(getString(R.string.pref_enable_notifications_default));
+
+        boolean areNotificationsEnabled = mPreferences.getBoolean(preferenceKey, defaultValue);
+        Log.d(LOG_TAG, String.format("Are notifications enabled? %s", areNotificationsEnabled));
+
+        return mPreferences.getBoolean(preferenceKey, defaultValue);
     }
 
     private Notification buildNotification(String text) {

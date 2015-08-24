@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_settings">Settings</string>
+    <string name="pref_key_enable_notifications" >pref_enable_notifications</string>
+    <string name="pref_title_notifications" >Show notifications?</string>
+    <string name="pref_enable_notifications_default" >true</string>
+
+    <string name="pref_key_country_code">pref_country_code</string>
+    <string name="pref_title_country">Country</string>
+    <string name="pref_desc_country">Select your country</string>
+    <string name="pref_country_code_default">us</string>
+
+
+    <string-array name="pref_country_values">
+        <item>ad</item>
+        <item>ar</item>
+        <item>au</item>
+        <item>be-fr</item>
+        <item>be-nl</item>
+        <item>bo</item>
+        <item>br</item>
+        <item>bg</item>
+        <item>ca-en</item>
+        <item>ca-fr</item>
+        <item>cl</item>
+        <item>co</item>
+        <item>cr</item>
+        <item>cy</item>
+        <item>cz</item>
+        <item>dk</item>
+        <item>de</item>
+        <item>ec</item>
+        <item>sv</item>
+        <item>es</item>
+        <item>ee</item>
+        <item>fi</item>
+        <item>fr</item>
+        <item>gt</item>
+        <item>hn</item>
+        <item>hk-en</item>
+        <item>is</item>
+        <item>ie</item>
+        <item>it</item>
+        <item>lv</item>
+        <item>li</item>
+        <item>lt</item>
+        <item>lu-fr</item>
+        <item>lu-de</item>
+        <item>hu</item>
+        <item>my-en</item>
+        <item>my-ms</item>
+        <item>mt</item>
+        <item>mc</item>
+        <item>mx</item>
+        <item>nl</item>
+        <item>nz</item>
+        <item>ni</item>
+        <item>no</item>
+        <item>pa</item>
+        <item>py</item>
+        <item>pe</item>
+        <item>ph</item>
+        <item>pl</item>
+        <item>pt</item>
+        <item>do</item>
+        <item>ch-de</item>
+        <item>sg-en</item>
+        <item>sk</item>
+        <item>ch-fr</item>
+        <item>se</item>
+        <item>tr</item>
+        <item>us</item>
+        <item>uk</item>
+        <item>uy</item>
+        <item>at</item>
+        <item>gr</item>
+        <item>tw</item>
+        <item>hk-zh</item>
+    </string-array>
+
+    <string-array name="pref_country_entries">
+        <item>Andorra</item>
+        <item>Argentina</item>
+        <item>Australia</item>
+        <item>Belgique (français)</item>
+        <item>België (Nederlands)</item>
+        <item>Bolivia</item>
+        <item>Brasil</item>
+        <item>Bulgaria</item>
+        <item>Canada (English)</item>
+        <item>Canada (français)</item>
+        <item>Chile</item>
+        <item>Colombia</item>
+        <item>Costa Rica</item>
+        <item>Cyprus</item>
+        <item>Czech Republic</item>
+        <item>Denmark</item>
+        <item>Deutschland</item>
+        <item>Ecuador</item>
+        <item>El Salvador</item>
+        <item>España</item>
+        <item>Estonia</item>
+        <item>Finland</item>
+        <item>France</item>
+        <item>Guatemala</item>
+        <item>Honduras</item>
+        <item>Hong Kong (English)</item>
+        <item>Iceland</item>
+        <item>Ireland</item>
+        <item>Italia</item>
+        <item>Latvia</item>
+        <item>Liechtenstein</item>
+        <item>Lithuania</item>
+        <item>Luxembourg (français)</item>
+        <item>Luxemburg (Deutsch)</item>
+        <item>Magyarország</item>
+        <item>Malaysia (English)</item>
+        <item>Malaysia (Melayu)</item>
+        <item>Malta</item>
+        <item>Monaco</item>
+        <item>México</item>
+        <item>Nederland</item>
+        <item>New Zealand</item>
+        <item>Nicaragua</item>
+        <item>Norway</item>
+        <item>Panamá</item>
+        <item>Paraguay</item>
+        <item>Perú</item>
+        <item>Philippines</item>
+        <item>Polska</item>
+        <item>Portugal</item>
+        <item>República Dominicana</item>
+        <item>Schweiz (Deutsch)</item>
+        <item>Singapore (English)</item>
+        <item>Slovakia</item>
+        <item>Suisse (français)</item>
+        <item>Sverige</item>
+        <item>Türkiye</item>
+        <item>USA</item>
+        <item>United Kingdom</item>
+        <item>Uruguay</item>
+        <item>Österreich</item>
+        <item>Ελλάδα</item>
+        <item>台灣</item>
+        <item>香港（中文）</item>
+    </string-array>
+</resources>

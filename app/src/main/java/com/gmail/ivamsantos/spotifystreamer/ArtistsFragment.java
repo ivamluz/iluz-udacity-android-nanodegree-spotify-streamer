@@ -2,9 +2,11 @@ package com.gmail.ivamsantos.spotifystreamer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -41,6 +43,8 @@ public class ArtistsFragment extends Fragment {
     public static final String BUNDLE_KEY_ARTISTS = "artists";
     public static final String BUNDLE_KEY_SEARCH_TERM = "search-term";
 
+    private SharedPreferences mPreferences;
+
     private ArrayList<Artist> mArtists;
     private ArrayAdapter<Artist> mArtistsAdapter;
     private View mRootView;
@@ -65,6 +69,8 @@ public class ArtistsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_artists, container, false);
+
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         String searchTerm = "";
         mArtists = new ArrayList<>();
@@ -228,9 +234,12 @@ public class ArtistsFragment extends Fragment {
             String searchTerms = params[0];
             Map<String, Object> options = new HashMap<>();
             options.put(SpotifyService.LIMIT, SEARCH_LIMIT);
+            String countryCode = mPreferences.getString(getString(R.string.pref_key_country_code), getString(R.string.pref_country_code_default));
+            options.put(SpotifyService.COUNTRY, countryCode);
 
             List<Artist> artists = null;
             try {
+                Log.d(LOG_TAG, String.format("Querying spotify. Params: [searchTerms: %s, country: %s]", searchTerms, countryCode));
                 artists = mSpotify.searchArtists(searchTerms, options).artists.items;
                 Log.d(LOG_TAG, "Found " + artists.size() + " artists.");
             } catch (Exception e) {

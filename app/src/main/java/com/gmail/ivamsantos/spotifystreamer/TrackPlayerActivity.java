@@ -84,6 +84,9 @@ public class TrackPlayerActivity extends ActionBarActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+
                 return true;
             case android.R.id.home:
                 onBackPressed();
