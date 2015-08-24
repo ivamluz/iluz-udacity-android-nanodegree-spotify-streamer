@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp">
+              android:layout_width="match_parent"
+              android:layout_height="?android:attr/listPreferredItemHeight"
+              android:paddingLeft="16dp"
+              android:paddingRight="16dp">
 
     <ImageView
         android:id="@+id/artist_image"
@@ -12,7 +12,7 @@
         android:layout_height="50dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_artist_placeholder"
-        android:layout_gravity="center_vertical" />
+        android:layout_gravity="center_vertical"/>
 
     <TextView
         android:id="@+id/artist_name"
@@ -22,6 +22,6 @@
         tools:text="Artist Name"
         android:textColor="#606060"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="16dp" />
+        android:layout_marginLeft="16dp"/>
 
 </LinearLayout>

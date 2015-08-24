@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="notification_loading" >%1$s (loading)</string>
-    <string name="notification_playing" >%1$s (playing)</string>
-    <string name="notification_paused" >%1$s (paused)</string>
+    <string name="notification_loading">%1$s (loading)</string>
+    <string name="notification_playing">%1$s (playing)</string>
+    <string name="notification_paused">%1$s (paused)</string>
 </resources>

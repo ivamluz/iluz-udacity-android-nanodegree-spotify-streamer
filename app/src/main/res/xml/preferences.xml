@@ -3,7 +3,7 @@
     <CheckBoxPreference
         android:key="@string/pref_key_enable_notifications"
         android:title="@string/pref_title_notifications"
-        android:defaultValue="true" />
+        android:defaultValue="true"/>
 
     <ListPreference
         android:key="@string/pref_key_country_code"
@@ -11,5 +11,5 @@
         android:dialogTitle="@string/pref_desc_country"
         android:entries="@array/pref_country_entries"
         android:entryValues="@array/pref_country_values"
-        android:defaultValue="@string/pref_country_code_default" />
+        android:defaultValue="@string/pref_country_code_default"/>
 </PreferenceScreen>

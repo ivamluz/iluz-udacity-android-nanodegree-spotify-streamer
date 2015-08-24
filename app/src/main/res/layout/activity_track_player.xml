@@ -1,8 +1,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/track_player_container"
-    android:name="com.gmail.ivamsantos.spotifystreamer.TrackPlayerActivity"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:ignore="MergeRootFrame"
-    tools:layout="@layout/fragment_track_player" />
+             xmlns:tools="http://schemas.android.com/tools"
+             android:id="@+id/track_player_container"
+             android:name="com.gmail.ivamsantos.spotifystreamer.TrackPlayerActivity"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:ignore="MergeRootFrame"
+             tools:layout="@layout/fragment_track_player"/>

@@ -1,12 +1,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.gmail.ivamsantos.spotifystreamer.ArtistTopTracksFragment">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:paddingLeft="@dimen/activity_horizontal_margin"
+              android:paddingRight="@dimen/activity_horizontal_margin"
+              android:paddingTop="@dimen/activity_vertical_margin"
+              android:paddingBottom="@dimen/activity_vertical_margin"
+              tools:context="com.gmail.ivamsantos.spotifystreamer.ArtistTopTracksFragment">
 
     <ListView
         android:layout_width="match_parent"
@@ -14,7 +14,7 @@
         android:id="@+id/list_top_tracks"
         android:layout_gravity="center_vertical"
         android:visibility="gone"
-        android:layout_weight="1" />
+        android:layout_weight="1"/>
 
 
     <ProgressBar
@@ -24,7 +24,7 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:visibility="gone"
-        android:id="@+id/load_tracks_progress_bar" />
+        android:id="@+id/load_tracks_progress_bar"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -35,6 +35,6 @@
         android:gravity="center"
         android:layout_weight="1"
         android:visibility="gone"
-        android:id="@+id/no_tracks_message" />
+        android:id="@+id/no_tracks_message"/>
 
 </LinearLayout>
