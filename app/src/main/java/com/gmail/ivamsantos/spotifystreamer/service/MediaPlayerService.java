@@ -31,6 +31,11 @@ import java.util.concurrent.TimeUnit;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.Track;
 
+/**
+ * This implementation was inspired on the following samples:
+ * - https://android.googlesource.com/platform/development/+/master/samples/RandomMusicPlayer/
+ * - http://code.tutsplus.com/tutorials/create-a-music-player-on-android-song-playback--mobile-22778
+ */
 public class MediaPlayerService extends Service implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
